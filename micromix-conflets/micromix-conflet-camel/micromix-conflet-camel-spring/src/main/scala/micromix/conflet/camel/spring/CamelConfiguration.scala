@@ -11,7 +11,7 @@ class CamelConfiguration {
   @Autowired
   var applicationContext: ApplicationContext = _
 
-  @Bean
+  @Bean(initMethod = "start", destroyMethod = "stop")
   def camelContext =
     new SpringCamelContext(applicationContext)
 

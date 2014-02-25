@@ -5,17 +5,12 @@ import org.scalatest.junit.JUnitRunner
 import org.scalatest.FunSuite
 import org.springframework.context.annotation.{Bean, Configuration}
 import java.net.URL
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.context.ApplicationContext
-import org.apache.camel.spring.SpringCamelContext
 import com.fasterxml.jackson.databind.ObjectMapper
 import micromix.boot.spring.SpringBootSupport
 import scala.collection.JavaConversions._
 
 @RunWith(classOf[JUnitRunner])
 class RestGatewayConfigurationTest extends FunSuite with SpringBootSupport {
-
-  override def basePackage: String = "micromix.services.restgateway.spring"
 
   val jsonMapper = new ObjectMapper
 
@@ -43,15 +38,8 @@ class RestGatewayConfigurationTest extends FunSuite with SpringBootSupport {
 @Configuration
 class TestConfig {
 
-  @Autowired
-  var applicationContext: ApplicationContext = _
-
   @Bean
   def invoices =
     new InvoicesService()
-
-  @Bean(initMethod = "start")
-  def camelContext =
-    new SpringCamelContext(applicationContext)
 
 }
