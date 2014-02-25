@@ -1,4 +1,6 @@
-include 'micromix-conflets',
+include 'micromix-boots',
+        'micromix-boots:micromix-boot-spring',
+        'micromix-conflets',
         'micromix-conflets:micromix-conflet-camel',
         'micromix-conflets:micromix-conflet-camel:micromix-conflet-camel-spring',
         'micromix-infra',

@@ -9,6 +9,17 @@ subprojects {
     }
 }
 
+project('micromix-boots') {
+    project('micromix-boot-spring') {
+        apply plugin: 'scala'
+
+        dependencies {
+            compile 'org.scala-lang:scala-library:2.10.3'
+            compile 'org.springframework:spring-context:3.2.5.RELEASE'
+        }
+    }
+}
+
 project('micromix-conflets') {
     project('micromix-conflet-camel') {
         project('micromix-conflet-camel-spring') {
@@ -17,6 +28,8 @@ project('micromix-conflets') {
             dependencies {
                 compile 'org.scala-lang:scala-library:2.10.3'
                 compile 'org.apache.camel:camel-spring:2.12.2'
+
+                testCompile project(':micromix-boots:micromix-boot-spring')
 
                 testCompile 'junit:junit:4.11'
                 testCompile 'org.scalatest:scalatest_2.10:2.0'
@@ -38,6 +51,7 @@ project('micromix-infra') {
                 compile 'org.apache.camel:camel-spring:2.12.2'
                 compile 'org.apache.camel:camel-jackson:2.12.2'
 
+                testCompile project(':micromix-boots:micromix-boot-spring')
                 testCompile project(':micromix-conflets:micromix-conflet-camel:micromix-conflet-camel-spring')
 
                 testCompile 'junit:junit:4.11'
