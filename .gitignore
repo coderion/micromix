@@ -2,6 +2,7 @@
 .idea
 *.ipr
 **.iml
+classes
 
 # Gradle
 .gradle

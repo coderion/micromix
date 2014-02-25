@@ -1,1 +1,6 @@
-include 'micromix-services', 'micromix-services:micromix-services-restgateway'
+include 'micromix-conflets',
+        'micromix-conflets:micromix-conflet-camel',
+        'micromix-conflets:micromix-conflet-camel:micromix-conflet-camel-spring',
+        'micromix-infra',
+        'micromix-infra:micromix-infra-restgateway',
+        'micromix-infra:micromix-infra-restgateway:micromix-infra-restgateway-spring'
