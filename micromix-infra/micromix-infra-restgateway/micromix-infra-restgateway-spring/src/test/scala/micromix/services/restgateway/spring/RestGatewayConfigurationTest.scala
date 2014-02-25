@@ -3,7 +3,7 @@ package micromix.services.restgateway.spring
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 import org.scalatest.FunSuite
-import org.springframework.context.annotation.{Bean, Configuration}
+import org.springframework.context.annotation.Configuration
 import java.net.URL
 import com.fasterxml.jackson.databind.ObjectMapper
 import micromix.boot.spring.SpringBootSupport
@@ -11,6 +11,9 @@ import scala.collection.JavaConversions._
 
 @RunWith(classOf[JUnitRunner])
 class RestGatewayConfigurationTest extends FunSuite with SpringBootSupport {
+
+  override def beans =
+    Map("invoices" -> classOf[InvoicesService])
 
   val jsonMapper = new ObjectMapper
 
@@ -32,14 +35,5 @@ class RestGatewayConfigurationTest extends FunSuite with SpringBootSupport {
       jsonMapper.readValue(is, classOf[java.util.List[java.util.Map[String, Any]]]).map(_.get("title"))
     }
   }
-
-}
-
-@Configuration
-class TestConfig {
-
-  @Bean
-  def invoices =
-    new InvoicesService()
 
 }
