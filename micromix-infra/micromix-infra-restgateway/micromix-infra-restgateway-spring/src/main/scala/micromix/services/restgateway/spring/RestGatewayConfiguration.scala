@@ -26,8 +26,8 @@ class RestGatewayConfiguration {
   var applicationContext: ApplicationContext = _
 
   @Bean
-  def nettyEndpointRoute = {
-    val x = new RouteBuilder() {
+  def nettyEndpointRoute =
+    new RouteBuilder() {
       override def configure() {
         from("netty-http:http://localhost:18080/api?matchOnUriPrefix=true").process(new Processor() {
           override def process(exchange: Exchange) {
@@ -58,8 +58,5 @@ class RestGatewayConfiguration {
           marshal().json(JsonLibrary.Jackson).log("${body}")
       }
     }
-    camelContext.addRoutes(x)
-    x
-  }
 
 }
