@@ -3,6 +3,5 @@ include 'micromix-boots',
         'micromix-conflets',
         'micromix-conflets:micromix-conflet-camel',
         'micromix-conflets:micromix-conflet-camel:micromix-conflet-camel-spring',
-        'micromix-infra',
-        'micromix-infra:micromix-infra-restgateway',
-        'micromix-infra:micromix-infra-restgateway:micromix-infra-restgateway-spring'
+        'micromix-conflets:micromix-conflet-restgateway',
+        'micromix-conflets:micromix-conflet-restgateway:micromix-conflet-restgateway-spring'

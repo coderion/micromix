@@ -44,11 +44,9 @@ project('micromix-conflets') {
             }
         }
     }
-}
 
-project('micromix-infra') {
-    project('micromix-infra-restgateway') {
-        project('micromix-infra-restgateway-spring') {
+    project('micromix-conflet-restgateway') {
+        project('micromix-conflet-restgateway-spring') {
             apply plugin: 'scala'
 
             dependencies {
