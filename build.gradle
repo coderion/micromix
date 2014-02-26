@@ -9,7 +9,9 @@ subprojects {
     }
 
     ext {
-        scalaLibraryDependency = 'org.scala-lang:scala-library:2.10.3'
+        camelVersion = '2.12.3'
+        camelSpring = "org.apache.camel:camel-spring:$camelVersion"
+        scalaLibrary = 'org.scala-lang:scala-library:2.10.3'
     }
 }
 
@@ -18,7 +20,7 @@ project('micromix-boots') {
         apply plugin: 'scala'
 
         dependencies {
-            compile scalaLibraryDependency
+            compile scalaLibrary
             compile 'org.springframework:spring-context:3.2.5.RELEASE'
             compile 'com.google.guava:guava:16.0.1'
 
@@ -33,8 +35,8 @@ project('micromix-conflets') {
             apply plugin: 'scala'
 
             dependencies {
-                compile scalaLibraryDependency
-                compile 'org.apache.camel:camel-spring:2.12.2'
+                compile scalaLibrary
+                compile camelSpring
 
                 testCompile project(':micromix-boots:micromix-boot-spring')
 
@@ -50,11 +52,11 @@ project('micromix-conflets') {
             apply plugin: 'scala'
 
             dependencies {
-                compile scalaLibraryDependency
+                compile scalaLibrary
                 compile 'org.springframework:spring-context:3.2.5.RELEASE'
-                compile 'org.apache.camel:camel-netty-http:2.12.2'
-                compile 'org.apache.camel:camel-spring:2.12.2'
-                compile 'org.apache.camel:camel-jackson:2.12.2'
+                compile 'org.apache.camel:camel-netty-http:2.12.3'
+                compile camelSpring
+                compile 'org.apache.camel:camel-jackson:2.12.3'
 
                 testCompile project(':micromix-boots:micromix-boot-spring')
                 testCompile project(':micromix-conflets:micromix-conflet-camel:micromix-conflet-camel-spring')
