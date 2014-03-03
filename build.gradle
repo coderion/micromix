@@ -2,7 +2,7 @@ subprojects {
     // Maven compatibility
     apply plugin: 'maven'
     group = 'com.github.micromix'
-    version = '0.0-SNAPSHOT'
+    version = '0.1-SNAPSHOT'
 
     repositories {
         mavenCentral()
