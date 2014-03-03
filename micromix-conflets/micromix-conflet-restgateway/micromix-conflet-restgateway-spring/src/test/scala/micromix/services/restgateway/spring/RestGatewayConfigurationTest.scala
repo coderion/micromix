@@ -4,6 +4,8 @@ import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 import org.scalatest.FunSuite
 import java.net.URL
+import java.util.{List => JList}
+import java.util.{Map => JMap}
 import com.fasterxml.jackson.databind.ObjectMapper
 import micromix.boot.spring.SpringBootSupport
 import scala.collection.JavaConversions._
@@ -31,7 +33,7 @@ class RestGatewayConfigurationTest extends FunSuite with SpringBootSupport {
       val out = con.getOutputStream
       jsonMapper.writeValue(out, new InvoiceQuery(1, "xxx"))
       val is = con.getInputStream
-      jsonMapper.readValue(is, classOf[java.util.List[java.util.Map[String, Any]]]).map(_.get("title"))
+      jsonMapper.readValue(is, classOf[JList[JMap[String, Any]]]).map(_.get("title"))
     }
   }
 
