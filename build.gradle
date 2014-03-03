@@ -11,6 +11,7 @@ subprojects {
     ext {
         camelVersion = '2.12.3'
         camelSpring = "org.apache.camel:camel-spring:$camelVersion"
+        junit = 'junit:junit:4.11'
         scalaLibrary = 'org.scala-lang:scala-library:2.10.3'
     }
 }
@@ -24,7 +25,7 @@ project('micromix-boots') {
             compile 'org.springframework:spring-context:3.2.5.RELEASE'
             compile 'com.google.guava:guava:16.0.1'
 
-            testCompile 'junit:junit:4.11'
+            testCompile junit
         }
     }
 }
@@ -40,7 +41,7 @@ project('micromix-conflets') {
 
                 testCompile project(':micromix-boots:micromix-boot-spring')
 
-                testCompile 'junit:junit:4.11'
+                testCompile junit
                 testCompile 'org.scalatest:scalatest_2.10:2.0'
                 testCompile 'ch.qos.logback:logback-classic:1.0.13'
             }
@@ -61,7 +62,7 @@ project('micromix-conflets') {
                 testCompile project(':micromix-boots:micromix-boot-spring')
                 testCompile project(':micromix-conflets:micromix-conflet-camel:micromix-conflet-camel-spring')
 
-                testCompile 'junit:junit:4.11'
+                testCompile junit
                 testCompile 'org.scalatest:scalatest_2.10:2.0'
                 testCompile 'ch.qos.logback:logback-classic:1.0.13'
             }
