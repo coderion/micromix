@@ -36,10 +36,10 @@ project('micromix-conflets') {
             apply plugin: 'scala'
 
             dependencies {
+                compile project(':micromix-boots:micromix-boot-spring')
+
                 compile scalaLibrary
                 compile camelSpring
-
-                testCompile project(':micromix-boots:micromix-boot-spring')
 
                 testCompile junit
                 testCompile 'org.scalatest:scalatest_2.10:2.0'

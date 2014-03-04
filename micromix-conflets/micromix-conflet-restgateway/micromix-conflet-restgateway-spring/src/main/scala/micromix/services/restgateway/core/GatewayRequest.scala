@@ -1,4 +1,4 @@
-package micromix.services.restgateway.spring
+package micromix.services.restgateway.core
 
 trait GatewayRequest {
 

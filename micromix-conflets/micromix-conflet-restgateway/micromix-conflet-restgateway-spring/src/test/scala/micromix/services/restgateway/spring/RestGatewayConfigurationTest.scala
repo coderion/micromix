@@ -9,9 +9,13 @@ import java.util.{Map => JMap}
 import com.fasterxml.jackson.databind.ObjectMapper
 import micromix.boot.spring.SpringBootSupport
 import scala.collection.JavaConversions._
+import scala.util.Random
 
 @RunWith(classOf[JUnitRunner])
 class RestGatewayConfigurationTest extends FunSuite with SpringBootSupport {
+
+  override def properties =
+    Map("micromix.services.restgateway.spring.netty.port" -> Random.nextInt(60000))
 
   override def beans =
     Map("invoices" -> classOf[InvoicesService])
@@ -20,14 +24,15 @@ class RestGatewayConfigurationTest extends FunSuite with SpringBootSupport {
 
   test("Should load invoice.") {
     assertResult(InvoicesService.referenceInvoice.getId) {
-      val is = new URL("http://localhost:18080/api/invoices/load/1").openStream
+      val httpPort = cachedProperties("micromix.services.restgateway.spring.netty.port")
+      val is = new URL("http://localhost:" + httpPort + "/api/invoices/load/1").openStream
       jsonMapper.readValue(is, classOf[Invoice]).getId
     }
   }
 
   test("Should find invoices by query.") {
     assertResult(List(InvoicesService.referenceInvoice.getTitle)) {
-      val con = new URL("http://localhost:18080/api/invoices/query").openConnection()
+      val con = new URL("http://localhost:" + cachedProperties("micromix.services.restgateway.spring.netty.port") + "/api/invoices/query").openConnection()
       con.setDoOutput(true)
       con.setRequestProperty("Content-Type", "application/json")
       val out = con.getOutputStream
