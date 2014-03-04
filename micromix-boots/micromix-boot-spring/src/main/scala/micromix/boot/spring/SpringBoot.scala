@@ -1,3 +1,3 @@
 package micromix.boot.spring
 
-class SpringBoot() extends SpringBootSupport
+class SpringBoot() extends SpringBootSupportEnabled

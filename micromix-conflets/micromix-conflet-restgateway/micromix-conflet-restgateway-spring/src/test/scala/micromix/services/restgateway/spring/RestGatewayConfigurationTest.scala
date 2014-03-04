@@ -7,12 +7,12 @@ import java.net.URL
 import java.util.{List => JList}
 import java.util.{Map => JMap}
 import com.fasterxml.jackson.databind.ObjectMapper
-import micromix.boot.spring.SpringBootSupport
+import micromix.boot.spring.SpringBootSupportEnabled
 import scala.collection.JavaConversions._
 import scala.util.Random
 
 @RunWith(classOf[JUnitRunner])
-class RestGatewayConfigurationTest extends FunSuite with SpringBootSupport {
+class RestGatewayConfigurationTest extends FunSuite with SpringBootSupportEnabled {
 
   override def properties =
     Map("micromix.services.restgateway.spring.netty.port" -> Random.nextInt(60000))

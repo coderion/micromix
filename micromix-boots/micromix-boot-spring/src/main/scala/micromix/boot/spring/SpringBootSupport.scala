@@ -9,7 +9,16 @@ import scala.collection.JavaConversions._
 
 trait SpringBootSupport {
 
+  // Members
+
+  protected val context = new AnnotationConfigApplicationContext
+
   protected val cachedProperties = properties
+
+  // Configuration callbacks
+
+  protected def properties: JMap[String, Any] =
+    emptyMap()
 
   def basePackage =
     System.getProperty("micromix.boot.spring.basepackage", "micromix")
@@ -20,19 +29,17 @@ trait SpringBootSupport {
   def beans: JMap[String, Class[_]] =
     emptyMap()
 
-  def properties: JMap[String, Any] =
-    emptyMap()
-
-  cachedProperties.foreach(property => System.setProperty(property._1, property._2.toString))
-  val context = new AnnotationConfigApplicationContext
-  context.register(classOf[BootstrapConfiguration])
-  beans.foreach {
-    bean =>
-      context.registerBeanDefinition(bean._1, new AnnotatedGenericBeanDefinition(bean._2))
+  def initialize() {
+    cachedProperties.foreach(property => System.setProperty(property._1, property._2.toString))
+    context.register(classOf[BootstrapConfiguration])
+    beans.foreach {
+      bean =>
+        context.registerBeanDefinition(bean._1, new AnnotatedGenericBeanDefinition(bean._2))
+    }
+    configurationClasses.foreach(context.register(_))
+    context.scan(basePackage)
+    context.refresh()
+    context.getBeansOfType(classOf[BootCallback]).values().foreach(_.afterBoot())
   }
-  configurationClasses.foreach(context.register(_))
-  context.scan(basePackage)
-  context.refresh()
-  context.getBeansOfType(classOf[BootCallback]).values().foreach(_.afterBoot())
 
 }
