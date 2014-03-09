@@ -14,6 +14,75 @@ subprojects {
         junit = 'junit:junit:4.11'
         scalaLibrary = 'org.scala-lang:scala-library:2.10.3'
     }
+
+    // Releasing
+    apply plugin: 'signing'
+    apply plugin: 'scala' // Workaround - scaladocJar needs this
+
+    ext.isReleaseVersion = !version.endsWith("-SNAPSHOT")
+
+    task scaladocJar(type: Jar, dependsOn: scaladoc) {
+        classifier = 'javadoc'
+        from 'build/docs/scaladoc'
+    }
+
+    task sourcesJar(type: Jar) {
+        from sourceSets.main.allSource
+        classifier = 'sources'
+    }
+
+    artifacts {
+        archives jar
+        archives scaladocJar
+        archives sourcesJar
+    }
+
+    signing {
+        required { isReleaseVersion && gradle.taskGraph.hasTask("uploadArchives") }
+        sign configurations.archives
+    }
+
+    uploadArchives {
+        repositories {
+            mavenDeployer {
+                beforeDeployment { MavenDeployment deployment -> signPom(deployment) }
+
+                def snapshotRepo = 'https://oss.sonatype.org/content/repositories/snapshots/'
+                def releaseRepo = 'https://oss.sonatype.org/service/local/staging/deploy/maven2/'
+                repository(url: isReleaseVersion ? releaseRepo : snapshotRepo) {
+                    authentication(userName: sonatypeUsername, password: sonatypePassword)
+                }
+
+                pom.project {
+                    name 'micromix'
+                    packaging 'jar'
+                    url 'https://github.com/hekonsek/micromix'
+                    description 'MicroMix'
+
+                    scm {
+                        url 'scm:git@github.com:hekonsek/micromix.git'
+                        connection 'scm:git@github.com:hekonsek/micromix.git'
+                        developerConnection 'scm:git@github.com:hekonsek/micromix.git'
+                    }
+
+                    developers {
+                        developer {
+                            id 'hekonsek'
+                            name 'Henryk Konsek'
+                        }
+                    }
+
+                    licenses {
+                        license {
+                            name 'The Apache Software License, Version 2.0'
+                            url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                        }
+                    }
+                }
+            }
+        }
+    }
+
 }
 
 project('micromix-boots') {
