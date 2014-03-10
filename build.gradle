@@ -15,6 +15,7 @@ subprojects {
         camelSpring = "org.apache.camel:camel-spring:$camelVersion"
         junit = 'junit:junit:4.11'
         scalaLibrary = 'org.scala-lang:scala-library:2.10.3'
+        scalaTest = 'org.scalatest:scalatest_2.10:2.0'
     }
 
     // Releasing
@@ -113,7 +114,7 @@ project('micromix-conflets') {
                 compile camelSpring
 
                 testCompile junit
-                testCompile 'org.scalatest:scalatest_2.10:2.0'
+                testCompile scalaTest
                 testCompile 'ch.qos.logback:logback-classic:1.0.13'
             }
         }
@@ -134,7 +135,7 @@ project('micromix-conflets') {
                 testCompile project(':micromix-conflets:micromix-conflet-camel:micromix-conflet-camel-spring')
 
                 testCompile junit
-                testCompile 'org.scalatest:scalatest_2.10:2.0'
+                testCompile scalaTest
                 testCompile 'ch.qos.logback:logback-classic:1.0.13'
             }
         }
