@@ -1,13 +1,15 @@
-subprojects {
+allprojects {
     // Maven compatibility
     apply plugin: 'maven'
     group = 'com.github.micromix'
-    version = '0.1-SNAPSHOT'
+    version = '0.2-SNAPSHOT'
 
     repositories {
         mavenCentral()
     }
+}
 
+subprojects {
     ext {
         camelVersion = '2.12.3'
         camelSpring = "org.apache.camel:camel-spring:$camelVersion"
@@ -16,8 +18,8 @@ subprojects {
     }
 
     // Releasing
-    apply plugin: 'signing'
     apply plugin: 'scala' // Workaround - scaladocJar needs this
+    apply plugin: 'signing'
 
     ext.isReleaseVersion = !version.endsWith("-SNAPSHOT")
 
@@ -45,7 +47,7 @@ subprojects {
     uploadArchives {
         repositories {
             mavenDeployer {
-                beforeDeployment { MavenDeployment deployment -> signPom(deployment) }
+                beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
 
                 def snapshotRepo = 'https://oss.sonatype.org/content/repositories/snapshots/'
                 def releaseRepo = 'https://oss.sonatype.org/service/local/staging/deploy/maven2/'
