@@ -15,7 +15,7 @@ subprojects {
         camelSpring = "org.apache.camel:camel-spring:$camelVersion"
         junit = 'junit:junit:4.11'
         scalaLibrary = 'org.scala-lang:scala-library:2.10.3'
-        scalaTest = 'org.scalatest:scalatest_2.10:2.0'
+        scalaTest = 'org.scalatest:scalatest_2.10:2.1.0'
     }
 
     // Releasing
