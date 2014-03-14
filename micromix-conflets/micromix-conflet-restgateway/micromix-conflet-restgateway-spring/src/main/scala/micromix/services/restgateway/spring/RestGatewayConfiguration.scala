@@ -1,7 +1,7 @@
 package micromix.services.restgateway.spring
 
 import org.springframework.context.annotation.{Bean, Configuration}
-import org.apache.camel.{Exchange, Processor, CamelContext}
+import org.apache.camel.{Exchange, Processor}
 import org.springframework.beans.factory.annotation.{Value, Autowired}
 import org.apache.camel.builder.RouteBuilder
 import org.apache.camel.component.netty.http.NettyHttpMessage
@@ -19,20 +19,17 @@ import com.fasterxml.jackson.databind.ObjectMapper.DefaultTyping
 class RestGatewayConfiguration {
 
   @Bean
-  def nettyEndpointRoute =
-    new FooBuilder()
+  def nettyGatewayEndpointRoute =
+    new NettyGatewayEndpointRoute()
 
 }
 
-class FooBuilder extends RouteBuilder {
+class NettyGatewayEndpointRoute extends RouteBuilder {
 
   @Autowired
-  var camelContext: CamelContext = _
+  private var applicationContext: ApplicationContext = _
 
-  val mapper = new ObjectMapper().enableDefaultTyping(DefaultTyping.NON_FINAL)
-
-  @Autowired
-  var applicationContext: ApplicationContext = _
+  private val inputJsonMapper = new ObjectMapper().enableDefaultTyping(DefaultTyping.NON_FINAL)
 
   @Autowired(required = false)
   var gatewayRequestMapper: GatewayRequestMapper[HttpRequest] = new NettyGatewayRequestMapper
@@ -61,7 +58,7 @@ class FooBuilder extends RouteBuilder {
           }
           ReflectionUtils.doWithMethods(bean, mc, null)
           val parameterType = method.getParameterTypes()(0)
-          exchange.getIn.setBody(x.parameters :+ mapper.readValue(body, parameterType))
+          exchange.getIn.setBody(x.parameters :+ inputJsonMapper.readValue(body, parameterType))
         }
         exchange.getIn.setHeader("bean", x.service)
         exchange.getIn.setHeader("method", x.operation)

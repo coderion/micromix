@@ -19,12 +19,12 @@ class RestGatewayConfigurationOptionalDependneciesTest extends FunSuite with Mat
     Map("requestMapper" -> classOf[MockRequestMapper])
 
   test("Should override default request mapper.") {
-    val mapper = context.getBean(classOf[RestGatewayConfiguration]).nettyEndpointRoute.gatewayRequestMapper
+    val mapper = context.getBean(classOf[RestGatewayConfiguration]).nettyGatewayEndpointRoute.gatewayRequestMapper
     mapper.isInstanceOf[MockRequestMapper] should be(true)
   }
 
   test("Should override default port.") {
-    val xport = context.getBean(classOf[RestGatewayConfiguration]).nettyEndpointRoute.port
+    val xport = context.getBean(classOf[RestGatewayConfiguration]).nettyGatewayEndpointRoute.port
     val port = cachedProperties("micromix.services.restgateway.spring.netty.port")
     xport should be(port)
   }
