@@ -1,6 +1,8 @@
 package micromix.services.restgateway.spring
 
 import scala.collection.JavaConversions._
+import java.io.Serializable
+import java.util
 
 class InvoicesService {
 
@@ -8,7 +10,10 @@ class InvoicesService {
     InvoicesService.referenceInvoice
 
   def query(query: InvoiceQuery): java.util.List[Invoice] =
-    List(InvoicesService.referenceInvoice)
+    new util.LinkedList(List(InvoicesService.referenceInvoice))
+
+  def methodTakingAbstract(id: Serializable) =
+    "response"
 
 }
 
@@ -18,3 +23,5 @@ object InvoicesService {
     new Invoice(1, "xxx")
 
 }
+
+class SerializableId extends Serializable

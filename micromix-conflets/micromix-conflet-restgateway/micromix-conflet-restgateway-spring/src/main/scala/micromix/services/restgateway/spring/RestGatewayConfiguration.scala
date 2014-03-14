@@ -13,6 +13,7 @@ import java.lang.reflect.Method
 import org.springframework.util.ReflectionUtils.MethodCallback
 import micromix.services.restgateway.core.GatewayRequestMapper
 import org.jboss.netty.handler.codec.http.HttpRequest
+import com.fasterxml.jackson.databind.ObjectMapper.DefaultTyping
 
 @Configuration
 class RestGatewayConfiguration {
@@ -28,7 +29,7 @@ class FooBuilder extends RouteBuilder {
   @Autowired
   var camelContext: CamelContext = _
 
-  val mapper = new ObjectMapper()
+  val mapper = new ObjectMapper().enableDefaultTyping(DefaultTyping.NON_FINAL)
 
   @Autowired
   var applicationContext: ApplicationContext = _

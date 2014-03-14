@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import micromix.boot.spring.SpringBootSupportEnabled
 import scala.collection.JavaConversions._
 import scala.util.Random
+import com.fasterxml.jackson.databind.ObjectMapper.DefaultTyping
 
 @RunWith(classOf[JUnitRunner])
 class RestGatewayConfigurationTest extends FunSuite with SpringBootSupportEnabled {
@@ -20,13 +21,16 @@ class RestGatewayConfigurationTest extends FunSuite with SpringBootSupportEnable
   override def beans =
     Map("invoices" -> classOf[InvoicesService])
 
-  val jsonMapper = new ObjectMapper
+  val jsonMapper = new ObjectMapper().enableDefaultTyping(DefaultTyping.NON_FINAL)
+
+  val readJsonMapper = new ObjectMapper()
+
 
   test("Should load invoice.") {
     assertResult(InvoicesService.referenceInvoice.getId) {
       val httpPort = cachedProperties("micromix.services.restgateway.spring.netty.port")
       val is = new URL("http://localhost:" + httpPort + "/api/invoices/load/1").openStream
-      jsonMapper.readValue(is, classOf[Invoice]).getId
+      readJsonMapper.readValue(is, classOf[Invoice]).getId
     }
   }
 
@@ -38,7 +42,19 @@ class RestGatewayConfigurationTest extends FunSuite with SpringBootSupportEnable
       val out = con.getOutputStream
       jsonMapper.writeValue(out, new InvoiceQuery(1, "xxx"))
       val is = con.getInputStream
-      jsonMapper.readValue(is, classOf[JList[JMap[String, Any]]]).map(_.get("title"))
+      readJsonMapper.readValue(is, classOf[JList[JMap[String, Any]]]).map(_.get("title"))
+    }
+  }
+
+  test("Should handle polymorphic arguments.") {
+    assertResult("response") {
+      val con = new URL("http://localhost:" + cachedProperties("micromix.services.restgateway.spring.netty.port") + "/api/invoices/methodTakingAbstract").openConnection()
+      con.setDoOutput(true)
+      con.setRequestProperty("Content-Type", "application/json")
+      val out = con.getOutputStream
+      jsonMapper.writeValue(out, new SerializableId())
+      val is = con.getInputStream
+      jsonMapper.readValue(is, classOf[String])
     }
   }
 
