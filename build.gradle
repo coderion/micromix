@@ -170,7 +170,7 @@ project('micromix-conflets') {
             apply plugin: 'osgi'
 
             dependencies {
-                compile 'org.apache.camel:camel-core:2.12.3'
+                compile "org.apache.camel:camel-core:$camelVersion"
                 compile 'org.springframework:spring-orm:3.2.5.RELEASE'
                 compile 'org.hibernate:hibernate-entitymanager:4.2.9.Final'
                 compile 'org.apache.geronimo.specs:geronimo-jpa_2.0_spec:1.1'
