@@ -1,8 +1,7 @@
 package micromix.conflet.hibernate42.springdm;
 
-import fuse.pocs.blueprint.openjpa.CustomRollbackException;
-import fuse.pocs.blueprint.openjpa.Person;
-import fuse.pocs.blueprint.openjpa.PersonService;
+import fuse.pocs.blueprint.openjpa.route.Person;
+import org.apache.camel.CamelContext;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,10 +23,10 @@ import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.logLevel;
 import static org.ops4j.pax.exam.karaf.options.LogLevelOption.LogLevel;
 
 @RunWith(PaxExam.class)
-public class Hibernate42Test extends Assert {
+public class Hibernate42CamelTest extends Assert {
 
     @Inject
-    PersonService personService;
+    CamelContext camelContext;
 
     @Configuration
     public Option[] commonOptions() {
@@ -48,6 +47,7 @@ public class Hibernate42Test extends Assert {
                 configureConsole().ignoreLocalConsole(),
                 logLevel(LogLevel.INFO),
 
+
                 features(
                         maven().groupId("org.apache.karaf.assemblies.features").artifactId("enterprise").type("xml")
                                 .classifier("features").version("2.3.3"), "transaction", "jndi", "jpa", "spring", "spring-orm"),
@@ -55,8 +55,11 @@ public class Hibernate42Test extends Assert {
                 features(
                         maven().groupId("org.apache.camel.karaf").artifactId("apache-camel").
                                 type("xml").classifier("features").version("2.12.2"),
-                        "camel-spring"),
+                        "camel-blueprint"),
 
+//                debugConfiguration("5005", true),
+
+                bundle("mvn:org.apache.camel/camel-jpa/2.12.2"),
 
                 mavenBundle().groupId("org.hsqldb").artifactId("hsqldb").version("2.3.2"),
                 mavenBundle().groupId("com.github.micromix").artifactId("micromix-conflet-hibernate42-springdm-itest-datasource").version("0.2-SNAPSHOT"),
@@ -74,46 +77,25 @@ public class Hibernate42Test extends Assert {
 
                 bundle("mvn:org.hibernate.common/hibernate-commons-annotations/4.0.4.Final"),
 
-                bundle("mvn:com.github.micromix/micromix-conflet-hibernate42-spring/0.2-SNAPSHOT"),
-                bundle("mvn:com.github.micromix/micromix-conflet-hibernate42-springdm/0.2-SNAPSHOT"),
+//                bundle("mvn:com.github.micromix/micromix-conflet-hibernate42-spring/0.2-SNAPSHOT"),
+//                bundle("mvn:com.github.micromix/micromix-conflet-hibernate42-springdm/0.2-SNAPSHOT"),
 
                 mavenBundle().groupId("org.hibernate").artifactId("hibernate-core").version("4.2.9.Final"),
                 mavenBundle().groupId("org.hibernate").artifactId("hibernate-entitymanager").version("4.2.9.Final"),
 
 
-                mavenBundle().groupId("com.github.micromix").artifactId("micromix-conflet-hibernate42-springdm-itest-business").version("0.2-SNAPSHOT"),
-                mavenBundle().groupId("org.hibernate").artifactId("hibernate-osgi").version("4.2.9.Final").startLevel(100)
+                mavenBundle().groupId("com.github.micromix").artifactId("micromix-conflet-hibernate42-springdm-itest-route").version("0.2-SNAPSHOT"),
+                mavenBundle().groupId("org.hibernate").artifactId("hibernate-osgi").version("4.2.9.Final").startLevel(100),
         };
     }
 
 
     @Test
     public void shouldSavePerson() {
-        // Given
-        Person person = new Person("John");
-
-        // When
-        personService.save(person);
-
-        // Then
-        Person loadedPerson = personService.findByName(person.getName());
-        assertEquals(person.getName(), loadedPerson.getName());
+        camelContext.createProducerTemplate().sendBody("direct:test", new Person("Henry"));
+        Person person = camelContext.createProducerTemplate().requestBody("direct:read", "xxx", Person.class);
+        assertEquals("Henry", person.getName());
     }
 
-    @Test
-    public void shouldRollbackSave() {
-        // Given
-        Person person = new Person("Henry");
-
-        // When
-        try {
-            personService.saveAndRollback(person);
-        } catch (CustomRollbackException e) {
-        }
-
-        // Then
-        Person loadedPerson = personService.findByName(person.getName());
-        assertNull(loadedPerson);
-    }
 
 }
