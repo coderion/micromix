@@ -2,7 +2,7 @@ allprojects {
     // Maven compatibility
     apply plugin: 'maven'
     group = 'com.github.micromix'
-    version = '0.2-SNAPSHOT'
+    version = '0.3-SNAPSHOT'
 
     repositories {
         mavenLocal()
