@@ -14,4 +14,4 @@
 # limitations under the License.
 
 language: java
-script: ./gradlew -Dorg.gradle.parallel=false install test
+script: ./gradlew -Dorg.gradle.parallel=false --stacktrace install test
