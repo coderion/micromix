@@ -14,5 +14,4 @@
 # limitations under the License.
 
 language: java
-install: ./gradlew -Dorg.gradle.parallel=false install
-script: ./gradlew -Dorg.gradle.parallel=false test
+script: ./gradlew -Dorg.gradle.parallel=false install test
