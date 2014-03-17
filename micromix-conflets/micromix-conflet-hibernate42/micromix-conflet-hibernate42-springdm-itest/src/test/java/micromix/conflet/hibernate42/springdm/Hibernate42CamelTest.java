@@ -77,9 +77,6 @@ public class Hibernate42CamelTest extends Assert {
 
                 bundle("mvn:org.hibernate.common/hibernate-commons-annotations/4.0.4.Final"),
 
-//                bundle("mvn:com.github.micromix/micromix-conflet-hibernate42-spring/0.2-SNAPSHOT"),
-//                bundle("mvn:com.github.micromix/micromix-conflet-hibernate42-springdm/0.2-SNAPSHOT"),
-
                 mavenBundle().groupId("org.hibernate").artifactId("hibernate-core").version("4.2.9.Final"),
                 mavenBundle().groupId("org.hibernate").artifactId("hibernate-entitymanager").version("4.2.9.Final"),
 
