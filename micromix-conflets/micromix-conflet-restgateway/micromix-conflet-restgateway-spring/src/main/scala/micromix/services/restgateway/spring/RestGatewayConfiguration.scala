@@ -13,15 +13,13 @@ import java.lang.reflect.Method
 import org.springframework.util.ReflectionUtils.MethodCallback
 import org.jboss.netty.handler.codec.http.HttpRequest
 import com.fasterxml.jackson.databind.ObjectMapper.DefaultTyping
-import micromix.services.restgateway.api.{InterceptedGatewayRequestDispatcher, GatewayRequest, GatewayInterceptor, GatewayRequestMapper}
+import micromix.services.restgateway.api._
 
 @Configuration
 class RestGatewayConfiguration {
 
   @Autowired(required = false)
-  var gatewayInterceptor: GatewayInterceptor = new GatewayInterceptor() {
-    override def intercept(gatewayRequest: GatewayRequest) = true
-  }
+  var gatewayInterceptor: GatewayInterceptor = new EnablingGatewayInterceptor
 
   @Bean
   def nettyGatewayEndpointRoute =
@@ -50,7 +48,13 @@ class NettyGatewayEndpointRoute(gatewayInterceptor: GatewayInterceptor) extends 
             val request = exchange.getIn(classOf[NettyHttpMessage]).getHttpRequest
             val body = exchange.getIn.getBody(classOf[String])
             val x = gatewayRequestMapper.mapRequest(request)
-            dispatch(x)
+            try {
+              dispatch(x)
+            } catch {
+              case e: IllegalAccessException =>
+                exchange.getIn.setHeader("ACL_EXCEPTION", true)
+
+            }
             if (body.isEmpty) {
               exchange.getIn.setBody(x.parameters)
             } else {
@@ -71,8 +75,11 @@ class NettyGatewayEndpointRoute(gatewayInterceptor: GatewayInterceptor) extends 
             exchange.getIn.setHeader("bean", x.service)
             exchange.getIn.setHeader("method", x.operation)
           }
-        }).recipientList().simple("bean:${headers.bean}?method=${headers.method}&multiParameterArray=true").
-          marshal().json(JsonLibrary.Jackson).log("${body}")
+        }).
+          choice().
+          when(header("ACL_EXCEPTION").isEqualTo(true)).setBody().constant("ACCESS DENIED").endChoice().
+          otherwise().recipientList().simple("bean:${headers.bean}?method=${headers.method}&multiParameterArray=true").
+          marshal().json(JsonLibrary.Jackson).log("${body}").endChoice()
       }
     })
   }

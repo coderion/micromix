@@ -20,8 +20,8 @@ trait SpringBootSupport {
   protected def properties: JMap[String, Any] =
     emptyMap()
 
-  def basePackage =
-    System.getProperty("micromix.boot.spring.basepackage", "micromix")
+  def basePackages =
+    Array(System.getProperty("micromix.boot.spring.basepackage", "micromix"))
 
   def configurationClasses: JList[Class[_]] =
     emptyList()
@@ -37,7 +37,7 @@ trait SpringBootSupport {
         context.registerBeanDefinition(bean._1, new AnnotatedGenericBeanDefinition(bean._2))
     }
     configurationClasses.foreach(context.register(_))
-    context.scan(basePackage)
+    context.scan(basePackages: _*)
     context.refresh()
     context.getBeansOfType(classOf[BootCallback]).values().foreach(_.afterBoot())
   }

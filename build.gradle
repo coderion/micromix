@@ -227,6 +227,7 @@ project('micromix-conflets') {
                 testCompile junit
                 testCompile scalaTest
                 testCompile 'ch.qos.logback:logback-classic:1.0.13'
+                testCompile 'commons-io:commons-io:2.4'
             }
         }
     }

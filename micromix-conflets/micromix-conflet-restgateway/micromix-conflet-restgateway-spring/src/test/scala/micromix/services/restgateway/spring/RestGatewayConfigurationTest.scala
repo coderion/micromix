@@ -25,7 +25,6 @@ class RestGatewayConfigurationTest extends FunSuite with SpringBootSupportEnable
 
   val readJsonMapper = new ObjectMapper()
 
-
   test("Should load invoice.") {
     assertResult(InvoicesService.referenceInvoice.getId) {
       val httpPort = cachedProperties("micromix.services.restgateway.spring.netty.port")
