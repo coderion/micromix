@@ -1,4 +1,4 @@
-package micromix.services.restgateway.core
+package micromix.services.restgateway.api
 
 trait GatewayRequestMapper[T <: Any] {
 

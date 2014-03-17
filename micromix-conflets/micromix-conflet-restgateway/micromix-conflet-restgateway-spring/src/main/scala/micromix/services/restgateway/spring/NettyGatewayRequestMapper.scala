@@ -1,7 +1,7 @@
 package micromix.services.restgateway.spring
 
 import org.jboss.netty.handler.codec.http.HttpRequest
-import micromix.services.restgateway.core.{GatewayRequest, GatewayRequestMapper}
+import micromix.services.restgateway.api.{GatewayRequestMapper, GatewayRequest}
 
 class NettyGatewayRequestMapper extends GatewayRequestMapper[HttpRequest] {
 
