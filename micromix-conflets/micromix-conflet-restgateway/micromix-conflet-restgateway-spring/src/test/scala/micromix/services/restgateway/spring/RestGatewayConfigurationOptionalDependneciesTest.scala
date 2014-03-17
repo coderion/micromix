@@ -15,7 +15,7 @@ class RestGatewayConfigurationOptionalDependneciesTest extends FunSuite with Mat
   override def properties =
     Map("micromix.services.restgateway.spring.netty.port" -> Random.nextInt(60000))
 
-  override def beans =
+  override def namedBeansDefinitions =
     Map("requestMapper" -> classOf[MockRequestMapper])
 
   test("Should override default request mapper.") {

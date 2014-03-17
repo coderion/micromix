@@ -6,6 +6,7 @@ import java.util.{List => JList, Map => JMap, Collections}
 import Collections._
 
 import scala.collection.JavaConversions._
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory
 
 trait SpringBootSupport {
 
@@ -26,13 +27,16 @@ trait SpringBootSupport {
   def configurationClasses: JList[Class[_]] =
     emptyList()
 
-  def beans: JMap[String, Class[_]] =
+  def namedBeansDefinitions: JMap[String, Class[_]] =
     emptyMap()
+
+  def singletons: JList[_] =
+    emptyList()
 
   def initialize() {
     cachedProperties.foreach(property => System.setProperty(property._1, property._2.toString))
     context.register(classOf[BootstrapConfiguration])
-    beans.foreach {
+    namedBeansDefinitions.foreach {
       bean =>
         context.registerBeanDefinition(bean._1, new AnnotatedGenericBeanDefinition(bean._2))
     }
@@ -40,6 +44,16 @@ trait SpringBootSupport {
     context.scan(basePackages: _*)
     context.refresh()
     context.getBeansOfType(classOf[BootCallback]).values().foreach(_.afterBoot())
+    singletons.foreach {
+      bean =>
+        val beanRegistry = context.getAutowireCapableBeanFactory.asInstanceOf[ConfigurableListableBeanFactory]
+        beanRegistry.autowireBean(bean)
+        beanRegistry.registerSingleton(generateBeanName(bean), bean)
+
+    }
   }
+
+  protected def generateBeanName(bean: Any) =
+    bean.getClass.getName
 
 }

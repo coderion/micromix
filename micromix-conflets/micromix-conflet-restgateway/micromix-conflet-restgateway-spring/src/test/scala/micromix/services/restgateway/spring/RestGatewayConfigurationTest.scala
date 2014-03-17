@@ -18,7 +18,7 @@ class RestGatewayConfigurationTest extends FunSuite with SpringBootSupportEnable
   override def properties =
     Map("micromix.services.restgateway.spring.netty.port" -> Random.nextInt(60000))
 
-  override def beans =
+  override def namedBeansDefinitions =
     Map("invoices" -> classOf[InvoicesService])
 
   val jsonMapper = new ObjectMapper().enableDefaultTyping(DefaultTyping.NON_FINAL)
