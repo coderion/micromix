@@ -103,6 +103,17 @@ project('micromix-boots') {
     }
 }
 
+project('micromix-compendiums') {
+    project('micromix-compendium-crud') {
+        apply plugin: 'scala'
+
+        dependencies {
+            compile scalaLibrary
+            compile 'org.springframework.data:spring-data-commons:1.6.1.RELEASE'
+        }
+    }
+}
+
 project('micromix-conflets') {
     project('micromix-conflet-camel') {
         project('micromix-conflet-camel-spring') {

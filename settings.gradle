@@ -1,5 +1,7 @@
 include 'micromix-boots',
         'micromix-boots:micromix-boot-spring',
+        'micromix-compendiums',
+        'micromix-compendiums:micromix-compendium-crud',
         'micromix-conflets',
         'micromix-conflets:micromix-conflet-camel',
         'micromix-conflets:micromix-conflet-camel:micromix-conflet-camel-spring',
