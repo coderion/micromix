@@ -109,7 +109,11 @@ project('micromix-compendiums') {
 
         dependencies {
             compile scalaLibrary
-            compile 'org.springframework.data:spring-data-commons:1.6.1.RELEASE'
+            compile 'org.apache.commons:commons-lang3:3.1'
+            compile 'org.springframework.data:spring-data-commons:1.6.2.RELEASE'
+
+            testCompile junit
+            testCompile 'org.springframework.data:spring-data-jpa:1.4.2.RELEASE'
         }
     }
 }
