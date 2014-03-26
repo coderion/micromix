@@ -3,6 +3,7 @@ package micromix.services.restgateway.spring
 import scala.collection.JavaConversions._
 import java.io.Serializable
 import java.util
+import micromix.services.restgateway.api.Param
 
 class InvoicesService {
 
@@ -12,7 +13,7 @@ class InvoicesService {
   def query(query: InvoiceQuery): java.util.List[Invoice] =
     new util.LinkedList(List(InvoicesService.referenceInvoice))
 
-  def methodTakingAbstract(id: Serializable) =
+  def methodTakingAbstract(@Param(paramClass = classOf[SerializableId]) id: Serializable) =
     "response"
 
 }
