@@ -17,13 +17,12 @@ class DefaultApiExposer extends ApiExposer {
 
   private val inputJsonMapper = new ObjectMapper().enableDefaultTyping(DefaultTyping.NON_FINAL)
 
-  override def apiSchema(services: util.List[String]): String = {
+  private val returnJsonMapper = new ObjectMapper()
+
+  def serviceClasses(services: java.util.List[Class[_]]): String = {
     val contract = new StringBuilder
     services.foreach {
-      service =>
-        contract append "Service URL: /" + service + "\n"
-        val bean = applicationContext.getBean(service)
-        val serviceClass = AopUtils.getTargetClass(bean)
+      serviceClass =>
         serviceClass.getMethods.foreach {
           m =>
             if (!List("notifyAll", "notify", "getClass", "hashCode", "toString", "wait", "equals").contains(m.getName)) {
@@ -40,12 +39,35 @@ class DefaultApiExposer extends ApiExposer {
                   contract append "/{" + m.getParameterTypes()(0) + "}"
                 }
               }
+              contract append "\nReturns:"
+              val returnsAnnot = m.getAnnotation(classOf[Returns])
+              if (returnsAnnot != null) {
+                if (m.getReturnType == classOf[java.util.List[_]]) {
+                  contract append returnJsonMapper.writeValueAsString(Array(returnsAnnot.returnedClass().newInstance()))
+                } else {
+                  contract append returnJsonMapper.writeValueAsString(returnsAnnot.returnedClass().newInstance())
+                }
+              } else {
+                contract append returnJsonMapper.writeValueAsString(m.getReturnType.newInstance())
+              }
               contract append "\n"
             }
         }
     }
     println()
     println(contract.toString())
+    contract.toString()
+  }
+
+  override def apiSchema(services: util.List[String]): String = {
+    val contract = new StringBuilder
+    services.foreach {
+      service =>
+        contract append "Service URL: /" + service + "\n"
+        val bean = applicationContext.getBean(service)
+        val serviceClass = AopUtils.getTargetClass(bean)
+        contract append serviceClasses(List(serviceClass))
+    }
     contract.toString()
   }
 
