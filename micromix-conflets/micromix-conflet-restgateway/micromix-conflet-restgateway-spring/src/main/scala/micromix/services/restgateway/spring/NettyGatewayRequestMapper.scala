@@ -7,7 +7,7 @@ class NettyGatewayRequestMapper extends GatewayRequestMapper[HttpRequest] {
 
   override def mapRequest(request: HttpRequest): GatewayRequest = {
     val uriFragments = request.getUri.split("/")
-    val params: Array[Any] = uriFragments.slice(4, uriFragments.length).map(_.toInt)
+    val params = uriFragments.slice(4, uriFragments.length)
     DefaultGatewayRequest(uriFragments(2), uriFragments(3), params)
   }
 

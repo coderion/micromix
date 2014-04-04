@@ -56,7 +56,18 @@ class NettyGatewayEndpointRoute(gatewayInterceptor: GatewayInterceptor) extends 
 
             }
             if (body.isEmpty) {
-              exchange.getIn.setBody(x.parameters)
+              val bean = applicationContext.getBean(x.service).getClass
+              var method: Method = null
+              val mc = new MethodCallback {
+                override def doWith(m: Method): Unit = {
+                  if (m.getName == x.operation) {
+                    method = m
+                  }
+
+                }
+              }
+              ReflectionUtils.doWithMethods(bean, mc, null)
+              exchange.getIn.setBody(x.parameters.zipWithIndex.map(p => cc.getTypeConverter.convertTo(method.getParameterTypes()(p._2), p._1)))
             } else {
               val bean = applicationContext.getBean(x.service).getClass
               var method: Method = null

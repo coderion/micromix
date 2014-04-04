@@ -6,6 +6,6 @@ trait GatewayRequest {
 
   def operation: String
 
-  def parameters: Array[Any]
+  def parameters: Array[String]
 
 }
