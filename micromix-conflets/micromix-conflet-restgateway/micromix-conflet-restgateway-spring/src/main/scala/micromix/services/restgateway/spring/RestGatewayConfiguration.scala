@@ -8,9 +8,6 @@ import org.apache.camel.component.netty.http.NettyHttpMessage
 import org.apache.camel.model.dataformat.JsonLibrary
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.context.ApplicationContext
-import org.springframework.util.ReflectionUtils
-import java.lang.reflect.Method
-import org.springframework.util.ReflectionUtils.MethodCallback
 import org.jboss.netty.handler.codec.http.HttpRequest
 import com.fasterxml.jackson.databind.ObjectMapper.DefaultTyping
 import micromix.services.restgateway.api._
@@ -48,38 +45,20 @@ class NettyGatewayEndpointRoute(gatewayInterceptor: GatewayInterceptor) extends 
             val request = exchange.getIn(classOf[NettyHttpMessage]).getHttpRequest
             val body = exchange.getIn.getBody(classOf[String])
             val x = gatewayRequestMapper.mapRequest(request)
+            val bean = applicationContext.getBean(x.service).getClass
+            val method = bean.getDeclaredMethods.find(_.getName == x.operation) match {
+              case Some(m) => m
+              case None => throw new IllegalArgumentException("No such method")
+            }
             try {
               dispatch(x)
             } catch {
               case e: IllegalAccessException =>
                 exchange.getIn.setHeader("ACL_EXCEPTION", true)
-
             }
             if (body.isEmpty) {
-              val bean = applicationContext.getBean(x.service).getClass
-              var method: Method = null
-              val mc = new MethodCallback {
-                override def doWith(m: Method): Unit = {
-                  if (m.getName == x.operation) {
-                    method = m
-                  }
-
-                }
-              }
-              ReflectionUtils.doWithMethods(bean, mc, null)
               exchange.getIn.setBody(x.parameters.zipWithIndex.map(p => cc.getTypeConverter.convertTo(method.getParameterTypes()(p._2), p._1)))
             } else {
-              val bean = applicationContext.getBean(x.service).getClass
-              var method: Method = null
-              val mc = new MethodCallback {
-                override def doWith(m: Method): Unit = {
-                  if (m.getName == x.operation) {
-                    method = m
-                  }
-
-                }
-              }
-              ReflectionUtils.doWithMethods(bean, mc, null)
               val parameterType = method.getParameterTypes()(0)
               exchange.getIn.setBody(x.parameters :+ inputJsonMapper.readValue(body, parameterType))
             }
