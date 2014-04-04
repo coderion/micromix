@@ -8,8 +8,6 @@ import java.util.{Map => JMap}
 import micromix.boot.spring.SpringBootSupportEnabled
 import scala.collection.JavaConversions._
 import scala.util.Random
-import org.springframework.context.annotation.Configuration
-import micromix.services.restgateway.api.WhitelistAclGatewayInterceptor
 import java.net.URL
 import org.apache.commons.io.IOUtils
 import test.micromix.services.restgateway.spring.WhitelistAclInterceptorConfiguration
@@ -18,7 +16,11 @@ import test.micromix.services.restgateway.spring.WhitelistAclInterceptorConfigur
 class RestGatewayConfigurationWhitelistAclInterceptorTest extends FunSuite with Matchers with SpringBootSupportEnabled {
 
   override def basePackages =
-    Array("micromix.conflet.camel", "micromix.services.restgateway", "test.micromix.services.restgateway.spring")
+    Array("micromix.conflet.camel", "micromix.services.restgateway")
+
+
+  override def namedBeansDefinitions =
+    Map("invoices" -> classOf[InvoicesService])
 
   override def properties =
     Map("micromix.services.restgateway.spring.netty.port" -> Random.nextInt(60000))
