@@ -28,4 +28,6 @@ object FixedTokenAuthGatewayInterceptor {
 
   val tokenHeader = "micromix.conflet.restgateway.token"
 
+  val defaultToken = "secretMicroMixToken"
+
 }

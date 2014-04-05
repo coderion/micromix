@@ -17,7 +17,7 @@ class FixedTokenAuthGatewayInterceptorTest extends FunSuite with SpringBootSuppo
 
   test("Should inject default token.") {
     val interceptor = context.getBean(classOf[FixedTokenAuthGatewayInterceptor])
-    assertResult("secretMicroMixToken") {
+    assertResult(defaultToken) {
       interceptor.expectedToken
     }
   }
@@ -25,7 +25,7 @@ class FixedTokenAuthGatewayInterceptorTest extends FunSuite with SpringBootSuppo
   test("Should match token.") {
     val interceptor = context.getBean(classOf[FixedTokenAuthGatewayInterceptor])
     assertResult(true) {
-      interceptor.intercept(DefaultGatewayRequest(Map(tokenHeader -> "secretMicroMixToken"), null, null, null))
+      interceptor.intercept(DefaultGatewayRequest(Map(tokenHeader -> defaultToken), null, null, null))
     }
   }
 
