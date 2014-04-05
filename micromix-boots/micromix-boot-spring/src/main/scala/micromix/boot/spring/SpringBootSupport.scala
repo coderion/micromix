@@ -53,6 +53,10 @@ trait SpringBootSupport {
     }
   }
 
+  def autowire() {
+    context.getAutowireCapableBeanFactory.autowireBean(this)
+  }
+
   protected def generateBeanName(bean: Any) =
     bean.getClass.getName
 
