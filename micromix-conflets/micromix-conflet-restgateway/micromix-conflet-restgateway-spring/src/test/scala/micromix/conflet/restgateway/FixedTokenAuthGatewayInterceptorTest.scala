@@ -1,4 +1,4 @@
-package micromix.services.restgateway.api
+package micromix.conflet.restgateway
 
 import org.scalatest.{BeforeAndAfter, FunSuite}
 import micromix.boot.spring.SpringBootSupportEnabled
@@ -9,9 +9,13 @@ import org.junit.runner.RunWith
 import micromix.services.restgateway.spring.DefaultGatewayRequest
 import FixedTokenAuthGatewayInterceptor._
 import org.springframework.beans.factory.annotation.Autowired
+import scala.util.Random
 
 @RunWith(classOf[JUnitRunner])
 class FixedTokenAuthGatewayInterceptorTest extends FunSuite with BeforeAndAfter with SpringBootSupportEnabled {
+
+  override def properties =
+    Map("micromix.services.restgateway.spring.netty.port" -> Random.nextInt(60000))
 
   @Autowired
   var interceptor: FixedTokenAuthGatewayInterceptor = _

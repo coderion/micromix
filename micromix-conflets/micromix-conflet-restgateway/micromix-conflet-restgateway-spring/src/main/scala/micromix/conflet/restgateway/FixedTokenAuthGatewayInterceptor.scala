@@ -1,14 +1,15 @@
-package micromix.services.restgateway.api
+package micromix.conflet.restgateway
 
 import org.springframework.beans.factory.annotation.Value
 import FixedTokenAuthGatewayInterceptor._
+import micromix.services.restgateway.api.{GatewayRequest, GatewayInterceptor}
 
 case class FixedTokenAuthGatewayInterceptor() extends GatewayInterceptor {
 
   // Members
 
   @Value("${micromix.conflet.restgateway.token.expected:secretMicroMixToken}")
-  private[api] var expectedToken: String = _
+  private[restgateway] var expectedToken: String = _
 
   // Constructors
 
