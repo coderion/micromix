@@ -1,3 +1,23 @@
 package micromix.boot.spring
 
-class SpringBoot() extends SpringBootSupportEnabled
+import org.springframework.context.ApplicationContext
+
+case class SpringBoot() extends SpringBootSupportEnabled {
+
+  // Members
+
+  private var parentApplicationContext: ApplicationContext = null
+
+  // Constructors
+
+  def this(parentApplicationContext: ApplicationContext) = {
+    this()
+    this.parentApplicationContext = parentApplicationContext
+  }
+
+  // Overridden
+
+  override def parentContext =
+    parentApplicationContext
+
+}

@@ -7,6 +7,7 @@ import Collections._
 
 import scala.collection.JavaConversions._
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory
+import org.springframework.context.ApplicationContext
 
 trait SpringBootSupport {
 
@@ -21,8 +22,12 @@ trait SpringBootSupport {
   protected def properties: JMap[String, Any] =
     emptyMap()
 
+  protected def parentContext: ApplicationContext = null
+
   def basePackages =
     Array(System.getProperty("micromix.boot.spring.basepackage", "micromix"))
+
+  // Beans configuration callbacks
 
   def configurationClasses: JList[Class[_]] =
     emptyList()
@@ -33,7 +38,10 @@ trait SpringBootSupport {
   def singletons: JList[_] =
     emptyList()
 
+  // Initialization
+
   def initialize() {
+    Option(parentContext).foreach(parent => context.setParent(parent))
     cachedProperties.foreach(property => System.setProperty(property._1, property._2.toString))
     context.register(classOf[BootstrapConfiguration])
     namedBeansDefinitions.foreach {
