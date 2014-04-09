@@ -43,7 +43,6 @@ trait SpringBootSupport {
   def initialize() {
     Option(parentContext).foreach(parent => context.setParent(parent))
     cachedProperties.foreach(property => System.setProperty(property._1, property._2.toString))
-    context.register(classOf[BootstrapConfiguration])
     namedBeansDefinitions.foreach {
       bean =>
         context.registerBeanDefinition(bean._1, new AnnotatedGenericBeanDefinition(bean._2))

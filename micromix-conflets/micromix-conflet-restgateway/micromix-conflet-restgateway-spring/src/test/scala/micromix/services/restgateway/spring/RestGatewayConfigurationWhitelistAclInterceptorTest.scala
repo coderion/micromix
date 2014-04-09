@@ -16,7 +16,7 @@ import test.micromix.services.restgateway.spring.WhitelistAclInterceptorConfigur
 class RestGatewayConfigurationWhitelistAclInterceptorTest extends FunSuite with Matchers with SpringBootSupportEnabled {
 
   override def basePackages =
-    Array("micromix.conflet.camel", "micromix.services.restgateway")
+    Array("micromix.boot.spring", "micromix.conflet.camel", "micromix.services.restgateway")
 
 
   override def namedBeansDefinitions =
