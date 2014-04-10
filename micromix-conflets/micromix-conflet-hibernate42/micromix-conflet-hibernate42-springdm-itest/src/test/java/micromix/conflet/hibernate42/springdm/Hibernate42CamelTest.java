@@ -62,7 +62,7 @@ public class Hibernate42CamelTest extends Assert {
                 bundle("mvn:org.apache.camel/camel-jpa/2.12.2"),
 
                 mavenBundle().groupId("org.hsqldb").artifactId("hsqldb").version("2.3.2"),
-                mavenBundle().groupId("com.github.micromix").artifactId("micromix-conflet-hibernate42-springdm-itest-datasource").version("0.8-SNAPSHOT"),
+                mavenBundle().groupId("com.github.micromix").artifactId("micromix-conflet-hibernate42-springdm-itest-datasource").version("0.9-SNAPSHOT"),
 
                 bundle("mvn:com.fasterxml/classmate/0.9.0"),
                 bundle("mvn:org.apache.geronimo.specs/geronimo-servlet_3.0_spec/1.0"),
@@ -81,7 +81,7 @@ public class Hibernate42CamelTest extends Assert {
                 mavenBundle().groupId("org.hibernate").artifactId("hibernate-entitymanager").version("4.2.9.Final"),
 
 
-                mavenBundle().groupId("com.github.micromix").artifactId("micromix-conflet-hibernate42-springdm-itest-route").version("0.8-SNAPSHOT"),
+                mavenBundle().groupId("com.github.micromix").artifactId("micromix-conflet-hibernate42-springdm-itest-route").version("0.9-SNAPSHOT"),
                 mavenBundle().groupId("org.hibernate").artifactId("hibernate-osgi").version("4.2.9.Final").startLevel(100),
         };
     }
