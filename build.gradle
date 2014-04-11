@@ -98,6 +98,8 @@ project('micromix-boots') {
             compile 'org.springframework:spring-context:3.2.5.RELEASE'
             compile 'com.google.guava:guava:16.0.1'
 
+            compile("org.springframework.boot:spring-boot-starter:1.0.1.RELEASE")
+
             testCompile junit
         }
     }

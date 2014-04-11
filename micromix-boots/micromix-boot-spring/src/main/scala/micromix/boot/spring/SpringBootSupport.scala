@@ -1,19 +1,18 @@
 package micromix.boot.spring
 
-import org.springframework.context.annotation.AnnotationConfigApplicationContext
-import org.springframework.beans.factory.annotation.AnnotatedGenericBeanDefinition
 import java.util.{List => JList, Map => JMap, Collections}
 import Collections._
 
 import scala.collection.JavaConversions._
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory
 import org.springframework.context.ApplicationContext
+import org.springframework.boot.builder.{ParentContextApplicationContextInitializer, SpringApplicationBuilder}
 
 trait SpringBootSupport {
 
   // Members
 
-  protected val context = new AnnotationConfigApplicationContext
+  protected var context: ApplicationContext = _
 
   protected val cachedProperties = properties
 
@@ -41,22 +40,19 @@ trait SpringBootSupport {
   // Initialization
 
   def initialize() {
-    Option(parentContext).foreach(parent => context.setParent(parent))
+    val applicationBuilder = new SpringApplicationBuilder
+    applicationBuilder.sources(classOf[PropertiesPlaceholderConfiguration]).sources(configurationClasses: _*)
+    Option(parentContext).foreach(parent => applicationBuilder.initializers(new ParentContextApplicationContextInitializer(parent)))
     cachedProperties.foreach(property => System.setProperty(property._1, property._2.toString))
-    namedBeansDefinitions.foreach {
-      bean =>
-        context.registerBeanDefinition(bean._1, new AnnotatedGenericBeanDefinition(bean._2))
-    }
-    configurationClasses.foreach(context.register(_))
-    context.scan(basePackages: _*)
-    context.refresh()
+    applicationBuilder.initializers(new AnnotatedBeanDefinitionApplicationContextInitializer(namedBeansDefinitions))
+    applicationBuilder.initializers(new ScanPackagesApplicationContextInitializer(basePackages: _*))
+    context = applicationBuilder.run()
     context.getBeansOfType(classOf[BootCallback]).values().foreach(_.afterBoot())
     singletons.foreach {
       bean =>
         val beanRegistry = context.getAutowireCapableBeanFactory.asInstanceOf[ConfigurableListableBeanFactory]
         beanRegistry.autowireBean(bean)
         beanRegistry.registerSingleton(generateBeanName(bean), bean)
-
     }
   }
 
