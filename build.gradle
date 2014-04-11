@@ -17,6 +17,8 @@ subprojects {
         junit = 'junit:junit:4.11'
         scalaLibrary = 'org.scala-lang:scala-library:2.10.3'
         scalaTest = 'org.scalatest:scalatest_2.10:2.1.0'
+        springVersion = '4.0.3.RELEASE'
+        springContext = "org.springframework:spring-context:$springVersion"
     }
 
     // Releasing
@@ -232,7 +234,7 @@ project('micromix-conflets') {
 
             dependencies {
                 compile scalaLibrary
-                compile 'org.springframework:spring-context:3.2.5.RELEASE'
+                compile springContext
                 compile 'org.apache.camel:camel-netty-http:2.12.3'
                 compile camelSpring
                 compile 'org.apache.camel:camel-jackson:2.12.3'
