@@ -23,6 +23,9 @@ trait SpringBootSupport {
 
   protected def parentContext: ApplicationContext = null
 
+  protected def isWebApp: Boolean =
+    false
+
   def basePackages =
     Array(System.getProperty("micromix.boot.spring.basepackage", "micromix"))
 
@@ -40,7 +43,7 @@ trait SpringBootSupport {
   // Initialization
 
   def initialize() {
-    val applicationBuilder = new SpringApplicationBuilder
+    val applicationBuilder = new SpringApplicationBuilder().web(isWebApp)
     applicationBuilder.sources(classOf[PropertiesPlaceholderConfiguration]).sources(configurationClasses: _*)
     Option(parentContext).foreach(parent => applicationBuilder.initializers(new ParentContextApplicationContextInitializer(parent)))
     cachedProperties.foreach(property => System.setProperty(property._1, property._2.toString))
