@@ -8,6 +8,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 
 import static org.junit.Assert.assertNotNull;
@@ -25,6 +26,11 @@ public class ProjectConfigTest extends AutoConfiguration {
         projectContext = new MicroMixApplicationBuilder().applicationConfig(getClass()).build();
     }
 
+    @Bean
+    String testBean() {
+        return "testBean";
+    }
+
     @Test(expected = NoSuchBeanDefinitionException.class)
     public void shouldNotDetectProjectBeanUsingDefaultConfig() {
         defaultContext.getBean(ProjectBean.class);
@@ -35,6 +41,11 @@ public class ProjectConfigTest extends AutoConfiguration {
         assertNotNull(defaultContext.getBean(MicroMixBean.class));
     }
 
+    @Test(expected = NoSuchBeanDefinitionException.class)
+    public void shouldDetectTestBeanUsingDefaultConfig() {
+        defaultContext.getBean(String.class);
+    }
+
     @Test
     public void shouldDetectProjectBeanUsingProjectConfig() {
         assertNotNull(projectContext.getBean(ProjectBean.class));
@@ -43,6 +54,11 @@ public class ProjectConfigTest extends AutoConfiguration {
     @Test
     public void shouldDetectMicroMixBeanUsingProjectConfig() {
         assertNotNull(projectContext.getBean(MicroMixBean.class));
+    }
+
+    @Test
+    public void shouldDetectTestBeanUsingProjectConfig() {
+        assertNotNull(projectContext.getBean(String.class));
     }
 
 }
