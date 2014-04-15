@@ -15,10 +15,6 @@ import test.micromix.services.restgateway.spring.WhitelistAclInterceptorConfigur
 @RunWith(classOf[JUnitRunner])
 class RestGatewayConfigurationWhitelistAclInterceptorTest extends FunSuite with Matchers with SpringBootSupportEnabled {
 
-  override def basePackages =
-    Array("micromix.boot.spring", "micromix.conflet.camel", "micromix.services.restgateway")
-
-
   override def namedBeansDefinitions =
     Map("invoices" -> classOf[InvoicesService])
 
