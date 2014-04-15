@@ -5,7 +5,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 
 public class MicroMixApplicationBuilder {
 
-    private Class<? extends AutoConfiguration> applicationConfig = AutoConfiguration.class;
+    private Class<? extends MicroMixProjectConfiguration> applicationConfig = MicroMixProjectConfiguration.class;
 
     private boolean web = false;
 
@@ -17,7 +17,7 @@ public class MicroMixApplicationBuilder {
         return new SpringApplicationBuilder().sources(applicationConfig).web(web);
     }
 
-    public MicroMixApplicationBuilder applicationConfig(Class<? extends AutoConfiguration> applicationConfig) {
+    public MicroMixApplicationBuilder applicationConfig(Class<? extends MicroMixProjectConfiguration> applicationConfig) {
         this.applicationConfig = applicationConfig;
         return this;
     }

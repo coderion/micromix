@@ -1,8 +1,8 @@
 package some.other.packages;
 
 import micromix.MicroMixBean;
-import micromix.boot.spring.AutoConfiguration;
 import micromix.boot.spring.MicroMixApplicationBuilder;
+import micromix.boot.spring.MicroMixProjectConfiguration;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
@@ -15,7 +15,7 @@ import static org.junit.Assert.assertNotNull;
 
 @ComponentScan
 @EnableAutoConfiguration
-public class ProjectConfigTest extends AutoConfiguration {
+public class ProjectConfigTest extends MicroMixProjectConfiguration {
 
     ApplicationContext defaultContext = new MicroMixApplicationBuilder().build();
 

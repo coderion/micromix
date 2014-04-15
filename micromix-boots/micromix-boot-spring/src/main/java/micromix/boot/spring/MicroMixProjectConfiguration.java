@@ -6,5 +6,5 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @EnableAutoConfiguration
-public abstract class AutoConfiguration extends MicroMixScanner {
+public abstract class MicroMixProjectConfiguration extends MicroMixScanner {
 }
