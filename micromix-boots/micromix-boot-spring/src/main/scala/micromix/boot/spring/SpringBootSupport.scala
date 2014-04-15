@@ -6,7 +6,7 @@ import Collections._
 import scala.collection.JavaConversions._
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory
 import org.springframework.context.ApplicationContext
-import org.springframework.boot.builder.{ParentContextApplicationContextInitializer, SpringApplicationBuilder}
+import org.springframework.boot.builder.ParentContextApplicationContextInitializer
 
 trait SpringBootSupport {
 
@@ -26,9 +26,6 @@ trait SpringBootSupport {
   protected def isWebApp: Boolean =
     false
 
-  def basePackages =
-    Array(System.getProperty("micromix.boot.spring.basepackage", "micromix"))
-
   // Beans configuration callbacks
 
   def configurationClasses: JList[Class[_]] =
@@ -43,12 +40,12 @@ trait SpringBootSupport {
   // Initialization
 
   def initialize() {
-    val applicationBuilder = new SpringApplicationBuilder().web(isWebApp)
-    applicationBuilder.sources(classOf[AutoConfiguration]).sources(configurationClasses: _*)
+    val microMixApplicationBuilder = new MicroMixApplicationBuilder().web(isWebApp)
+    val applicationBuilder = microMixApplicationBuilder.toSpringApplicationBuilder
+    applicationBuilder.sources(configurationClasses: _*)
     Option(parentContext).foreach(parent => applicationBuilder.initializers(new ParentContextApplicationContextInitializer(parent)))
     cachedProperties.foreach(property => System.setProperty(property._1, property._2.toString))
     applicationBuilder.initializers(new AnnotatedBeanDefinitionApplicationContextInitializer(namedBeansDefinitions))
-    applicationBuilder.initializers(new ScanPackagesApplicationContextInitializer(basePackages: _*))
     context = applicationBuilder.run()
     context.getBeansOfType(classOf[BootCallback]).values().foreach(_.afterBoot())
     singletons.foreach {
