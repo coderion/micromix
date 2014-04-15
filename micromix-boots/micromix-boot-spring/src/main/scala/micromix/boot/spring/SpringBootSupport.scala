@@ -44,7 +44,7 @@ trait SpringBootSupport {
 
   def initialize() {
     val applicationBuilder = new SpringApplicationBuilder().web(isWebApp)
-    applicationBuilder.sources(classOf[PropertiesPlaceholderConfiguration]).sources(configurationClasses: _*)
+    applicationBuilder.sources(classOf[AutoConfiguration]).sources(configurationClasses: _*)
     Option(parentContext).foreach(parent => applicationBuilder.initializers(new ParentContextApplicationContextInitializer(parent)))
     cachedProperties.foreach(property => System.setProperty(property._1, property._2.toString))
     applicationBuilder.initializers(new AnnotatedBeanDefinitionApplicationContextInitializer(namedBeansDefinitions))
