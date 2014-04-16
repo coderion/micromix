@@ -19,6 +19,7 @@ subprojects {
         scalaTest = 'org.scalatest:scalatest_2.10:2.1.0'
         springVersion = '4.0.3.RELEASE'
         springContext = "org.springframework:spring-context:$springVersion"
+        springTest = "org.springframework:spring-test:$springVersion"
     }
 
     // Releasing
@@ -102,6 +103,7 @@ project('micromix-boots') {
             compile("org.springframework.boot:spring-boot-starter:1.0.1.RELEASE")
 
             testCompile junit
+            testCompile springTest
         }
     }
 }
