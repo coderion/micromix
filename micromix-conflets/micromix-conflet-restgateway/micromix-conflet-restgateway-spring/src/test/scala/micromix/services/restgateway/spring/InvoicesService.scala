@@ -17,6 +17,10 @@ class InvoicesService {
   def methodTakingAbstract(@Param(paramClass = classOf[SerializableId]) id: Serializable): String =
     "response"
 
+  def error() {
+    throw new RuntimeException("Error message!")
+  }
+
 }
 
 object InvoicesService {

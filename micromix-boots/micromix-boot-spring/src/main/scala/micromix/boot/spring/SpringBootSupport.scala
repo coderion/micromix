@@ -28,6 +28,9 @@ trait SpringBootSupport {
 
   // Beans configuration callbacks
 
+  def configurationClasses: JList[Class[_]] =
+    emptyList()
+
   def namedBeansDefinitions: JMap[String, Class[_]] =
     emptyMap()
 
@@ -39,6 +42,7 @@ trait SpringBootSupport {
   def initialize() {
     val microMixApplicationBuilder = new MicroMixApplicationBuilder().web(isWebApp)
     val applicationBuilder = microMixApplicationBuilder.toSpringApplicationBuilder
+    applicationBuilder.sources(configurationClasses: _*)
     Option(parentContext).foreach(parent => applicationBuilder.initializers(new ParentContextApplicationContextInitializer(parent)))
     cachedProperties.foreach(property => System.setProperty(property._1, property._2.toString))
     applicationBuilder.initializers(new AnnotatedBeanDefinitionApplicationContextInitializer(namedBeansDefinitions))
