@@ -59,7 +59,7 @@ public class Hibernate42Test extends Assert {
 
 
                 mavenBundle().groupId("org.hsqldb").artifactId("hsqldb").version("2.3.2"),
-                mavenBundle().groupId("com.github.micromix").artifactId("micromix-conflet-hibernate42-springdm-itest-datasource").version("0.10-SNAPSHOT"),
+                mavenBundle().groupId("com.github.micromix").artifactId("micromix-conflet-hibernate42-springdm-itest-datasource").version("0.11-SNAPSHOT"),
 
                 bundle("mvn:com.fasterxml/classmate/0.9.0"),
                 bundle("mvn:org.apache.geronimo.specs/geronimo-servlet_3.0_spec/1.0"),
@@ -74,13 +74,13 @@ public class Hibernate42Test extends Assert {
 
                 bundle("mvn:org.hibernate.common/hibernate-commons-annotations/4.0.4.Final"),
 
-                bundle("mvn:com.github.micromix/micromix-conflet-hibernate42-springdm/0.10-SNAPSHOT"),
+                bundle("mvn:com.github.micromix/micromix-conflet-hibernate42-springdm/0.11-SNAPSHOT"),
 
                 mavenBundle().groupId("org.hibernate").artifactId("hibernate-core").version("4.2.9.Final"),
                 mavenBundle().groupId("org.hibernate").artifactId("hibernate-entitymanager").version("4.2.9.Final"),
 
 
-                mavenBundle().groupId("com.github.micromix").artifactId("micromix-conflet-hibernate42-springdm-itest-business").version("0.10-SNAPSHOT"),
+                mavenBundle().groupId("com.github.micromix").artifactId("micromix-conflet-hibernate42-springdm-itest-business").version("0.11-SNAPSHOT"),
                 mavenBundle().groupId("org.hibernate").artifactId("hibernate-osgi").version("4.2.9.Final").startLevel(100)
         };
     }
