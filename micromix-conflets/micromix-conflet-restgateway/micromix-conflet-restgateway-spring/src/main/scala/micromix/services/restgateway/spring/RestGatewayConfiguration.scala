@@ -40,7 +40,15 @@ class NettyGatewayEndpointRoute(gatewayInterceptor: GatewayInterceptor) extends 
   def addRoutesToCamelContext(cc: CamelContext) {
     cc.addRoutes(new RouteBuilder() {
       override def configure() {
-        from("netty-http:http://0.0.0.0:" + port + "/api?matchOnUriPrefix=true").process(new Processor() {
+        onException(classOf[java.lang.Exception]).handled(true).process(new Processor() {
+          override def process(exchange: Exchange) {
+            val ex = exchange.getProperty(Exchange.EXCEPTION_CAUGHT, classOf[java.lang.Exception])
+            exchange.getIn.setBody(ex.getClass.getSimpleName + ": " + ex.getMessage)
+          }
+        }).marshal().json(JsonLibrary.Jackson)
+
+        from("netty-http:http://0.0.0.0:" + port + "/api?matchOnUriPrefix=true").
+          process(new Processor() {
           override def process(exchange: Exchange) {
             val request = exchange.getIn(classOf[NettyHttpMessage]).getHttpRequest
             val body = exchange.getIn.getBody(classOf[String])

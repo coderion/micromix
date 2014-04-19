@@ -57,4 +57,12 @@ class RestGatewayConfigurationTest extends FunSuite with SpringBootSupportEnable
     }
   }
 
+  test("Should return exception.") {
+    assertResult("RuntimeException: Error message!") {
+      val httpPort = cachedProperties("micromix.services.restgateway.spring.netty.port")
+      val is = new URL("http://localhost:" + httpPort + "/api/invoices/error").openStream
+      readJsonMapper.readValue(is, classOf[String])
+    }
+  }
+
 }
