@@ -11,6 +11,7 @@ import org.springframework.context.ApplicationContext
 import org.jboss.netty.handler.codec.http.HttpRequest
 import com.fasterxml.jackson.databind.ObjectMapper.DefaultTyping
 import micromix.services.restgateway.api._
+import micromix.conflet.restgateway.FixedTokenAuthGatewayInterceptor
 
 @Configuration
 class RestGatewayConfiguration {
@@ -73,6 +74,7 @@ class NettyGatewayEndpointRoute(gatewayInterceptor: GatewayInterceptor) extends 
             exchange.getIn.setHeader("bean", x.service)
             exchange.getIn.setHeader("method", x.operation)
             exchange.getIn.setHeader("Access-Control-Allow-Origin", "*")
+            exchange.getIn.setHeader("Access-Control-Allow-Headers", FixedTokenAuthGatewayInterceptor.tokenHeader)
           }
         }).
           choice().
