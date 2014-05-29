@@ -1,5 +1,7 @@
 package micromix.services.restgateway.api
 
-class DisablingGatewayInterceptor extends GatewayInterceptor {
-  override def intercept(gatewayRequest: GatewayRequest) = false
+import io.fabric8.process.spring.boot.actuator.camel.rest.{RestRequest, RestInterceptor}
+
+class DisablingGatewayInterceptor extends RestInterceptor {
+  override def intercept(gatewayRequest: RestRequest) = false
 }

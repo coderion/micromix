@@ -6,10 +6,10 @@ import micromix.boot.spring.SpringBootSupportEnabled
 import scala.collection.JavaConversions._
 import org.scalatest.junit.JUnitRunner
 import org.junit.runner.RunWith
-import micromix.services.restgateway.spring.DefaultGatewayRequest
 import FixedTokenAuthGatewayInterceptor._
 import org.springframework.beans.factory.annotation.Autowired
 import scala.util.Random
+import io.fabric8.process.spring.boot.actuator.camel.rest.RestRequest
 
 @RunWith(classOf[JUnitRunner])
 class FixedTokenAuthGatewayInterceptorTest extends FunSuite with BeforeAndAfter with SpringBootSupportEnabled {
@@ -37,19 +37,19 @@ class FixedTokenAuthGatewayInterceptorTest extends FunSuite with BeforeAndAfter 
 
   test("Should match token.") {
     assertResult(true) {
-      interceptor.intercept(DefaultGatewayRequest(Map(tokenHeader -> defaultToken), null, null, null))
+      interceptor.intercept(new RestRequest(Map(tokenHeader -> defaultToken), null, null, null))
     }
   }
 
   test("Should not match token.") {
     assertResult(false) {
-      interceptor.intercept(DefaultGatewayRequest(Map(tokenHeader -> "someRandomToken"), null, null, null))
+      interceptor.intercept(new RestRequest(Map(tokenHeader -> "someRandomToken"), null, null, null))
     }
   }
 
   test("Should not match if no token.") {
     assertResult(false) {
-      interceptor.intercept(DefaultGatewayRequest(Map[String, String](), null, null, null))
+      interceptor.intercept(new RestRequest(Map[String, String](), null, null, null))
     }
   }
 

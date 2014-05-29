@@ -12,12 +12,13 @@ import org.jboss.netty.handler.codec.http.HttpRequest
 import com.fasterxml.jackson.databind.ObjectMapper.DefaultTyping
 import micromix.services.restgateway.api._
 import micromix.conflet.restgateway.FixedTokenAuthGatewayInterceptor
+import io.fabric8.process.spring.boot.actuator.camel.rest.{RestInterceptor, RestRequest}
 
 @Configuration
 class RestGatewayConfiguration {
 
   @Autowired(required = false)
-  var gatewayInterceptor: GatewayInterceptor = new EnablingGatewayInterceptor
+  var gatewayInterceptor: RestInterceptor = new EnablingGatewayInterceptor
 
   @Bean
   def nettyGatewayEndpointRoute =
@@ -25,7 +26,7 @@ class RestGatewayConfiguration {
 
 }
 
-class NettyGatewayEndpointRoute(gatewayInterceptor: GatewayInterceptor) extends InterceptedGatewayRequestDispatcher(gatewayInterceptor) with RoutesBuilder {
+class NettyGatewayEndpointRoute(gatewayInterceptor: RestInterceptor) extends InterceptedGatewayRequestDispatcher(gatewayInterceptor) with RoutesBuilder {
 
   @Autowired
   private var applicationContext: ApplicationContext = _
@@ -85,6 +86,6 @@ class NettyGatewayEndpointRoute(gatewayInterceptor: GatewayInterceptor) extends 
     })
   }
 
-  override def doDispatch(gatewayRequest: GatewayRequest) {}
+  override def doDispatch(gatewayRequest: RestRequest) {}
 
 }

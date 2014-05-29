@@ -2,9 +2,9 @@ package micromix.conflet.restgateway
 
 import org.springframework.beans.factory.annotation.Value
 import FixedTokenAuthGatewayInterceptor._
-import micromix.services.restgateway.api.{GatewayRequest, GatewayInterceptor}
+import io.fabric8.process.spring.boot.actuator.camel.rest.{RestRequest, RestInterceptor}
 
-case class FixedTokenAuthGatewayInterceptor() extends GatewayInterceptor {
+case class FixedTokenAuthGatewayInterceptor() extends RestInterceptor {
 
   // Members
 
@@ -20,7 +20,7 @@ case class FixedTokenAuthGatewayInterceptor() extends GatewayInterceptor {
 
   // Overridden
 
-  override def intercept(gatewayRequest: GatewayRequest): Boolean =
+  override def intercept(gatewayRequest: RestRequest): Boolean =
     gatewayRequest.headers.get(tokenHeader) == expectedToken
 
 }
