@@ -8,11 +8,11 @@ public abstract class RestPipeline<RSP> {
         this.restInterceptor = restInterceptor;
     }
 
-    protected RSP dispatch(RestRequest restRequest, RSP rsp) {
-        if (!restInterceptor.intercept(restRequest)) {
+    protected RSP dispatch(RestRequest request, RSP response) {
+        if (!restInterceptor.intercept(request)) {
             throw new IllegalStateException("Cannot access gateway.");
         }
-        return doDispatch(restRequest, rsp);
+        return doDispatch(request, response);
     }
 
     protected abstract RSP doDispatch(RestRequest restRequest, RSP rsp);

@@ -12,7 +12,7 @@ import org.jboss.netty.handler.codec.http.HttpRequest
 import com.fasterxml.jackson.databind.ObjectMapper.DefaultTyping
 import micromix.services.restgateway.api._
 import micromix.conflet.restgateway.FixedTokenAuthGatewayInterceptor
-import io.fabric8.process.spring.boot.actuator.camel.rest.{RestPipeline, RestInterceptor, RestRequest}
+import io.fabric8.process.spring.boot.actuator.camel.rest.{RestRequestMapper, RestPipeline, RestInterceptor, RestRequest}
 
 @Configuration
 class RestGatewayConfiguration {
@@ -34,7 +34,7 @@ class NettyGatewayEndpointRoute(gatewayInterceptor: RestInterceptor) extends Res
   private val inputJsonMapper = new ObjectMapper().enableDefaultTyping(DefaultTyping.NON_FINAL)
 
   @Autowired(required = false)
-  var gatewayRequestMapper: GatewayRequestMapper[HttpRequest] = new NettyGatewayRequestMapper
+  var gatewayRequestMapper: RestRequestMapper[HttpRequest] = new NettyGatewayRequestMapper
 
   @Value("${micromix.services.restgateway.spring.netty.port:18080}")
   var port: Int = _

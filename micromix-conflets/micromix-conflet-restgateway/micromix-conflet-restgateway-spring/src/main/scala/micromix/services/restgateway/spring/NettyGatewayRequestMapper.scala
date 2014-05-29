@@ -1,12 +1,11 @@
 package micromix.services.restgateway.spring
 
 import org.jboss.netty.handler.codec.http.HttpRequest
-import micromix.services.restgateway.api.GatewayRequestMapper
 
 import scala.collection.JavaConversions._
-import io.fabric8.process.spring.boot.actuator.camel.rest.RestRequest
+import io.fabric8.process.spring.boot.actuator.camel.rest.{RestRequestMapper, RestRequest}
 
-class NettyGatewayRequestMapper extends GatewayRequestMapper[HttpRequest] {
+class NettyGatewayRequestMapper extends RestRequestMapper[HttpRequest] {
 
   override def mapRequest(request: HttpRequest): RestRequest = {
     val headers = request.headers.iterator.foldLeft(Map[String, String]()) {
