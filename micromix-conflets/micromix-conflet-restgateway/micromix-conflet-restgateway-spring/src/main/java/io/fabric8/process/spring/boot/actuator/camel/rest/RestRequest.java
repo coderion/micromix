@@ -13,7 +13,7 @@ public class RestRequest {
 
     private final String[] parameters;
 
-    public RestRequest(Map<String, String> headers, String service, String operation, String[] parameters) {
+    public RestRequest(Map<String, String> headers, String service, String operation, String... parameters) {
         this.headers = headers;
         this.service = service;
         this.operation = operation;

@@ -4,7 +4,7 @@ public class WhiteListAccessRestInterceptor implements RestInterceptor {
 
     private final RestOperation[] restOperations;
 
-    public WhiteListAccessRestInterceptor(RestOperation[] restOperations) {
+    public WhiteListAccessRestInterceptor(RestOperation... restOperations) {
         this.restOperations = restOperations;
     }
 
