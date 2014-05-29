@@ -10,7 +10,7 @@ public abstract class RestPipeline<RSP> {
 
     protected RSP dispatch(RestRequest request, RSP response) {
         if (!restInterceptor.intercept(request)) {
-            throw new IllegalStateException("Cannot access gateway.");
+            throw new RestInterceptorException("Cannot access gateway.");
         }
         return doDispatch(request, response);
     }

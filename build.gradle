@@ -245,6 +245,7 @@ project('micromix-conflets') {
                 testCompile project(':micromix-conflets:micromix-conflet-camel:micromix-conflet-camel-spring')
 
                 testCompile junit
+                testCompile 'org.mockito:mockito-core:1.9.5'
                 testCompile scalaTest
                 testCompile 'ch.qos.logback:logback-classic:1.0.13'
                 testCompile 'commons-io:commons-io:2.4'
