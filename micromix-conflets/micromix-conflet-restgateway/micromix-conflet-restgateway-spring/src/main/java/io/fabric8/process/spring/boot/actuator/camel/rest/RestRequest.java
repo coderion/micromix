@@ -1,5 +1,6 @@
 package io.fabric8.process.spring.boot.actuator.camel.rest;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class RestRequest {
@@ -17,6 +18,10 @@ public class RestRequest {
         this.service = service;
         this.operation = operation;
         this.parameters = parameters;
+    }
+
+    public RestRequest(String service, String operation, String... parameters) {
+        this(new HashMap<String, String>(), service, operation, parameters);
     }
 
     public Map<String, String> headers() {

@@ -4,7 +4,7 @@ public class AndRestInterceptor implements RestInterceptor {
 
     private final RestInterceptor[] interceptors;
 
-    public AndRestInterceptor(RestInterceptor[] interceptors) {
+    public AndRestInterceptor(RestInterceptor... interceptors) {
         this.interceptors = interceptors;
     }
 

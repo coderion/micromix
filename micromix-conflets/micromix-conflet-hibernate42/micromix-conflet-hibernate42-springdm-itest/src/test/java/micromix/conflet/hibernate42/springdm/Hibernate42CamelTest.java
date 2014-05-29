@@ -3,6 +3,7 @@ package micromix.conflet.hibernate42.springdm;
 import fuse.pocs.blueprint.openjpa.route.Person;
 import org.apache.camel.CamelContext;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.Configuration;
@@ -23,6 +24,7 @@ import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.logLevel;
 import static org.ops4j.pax.exam.karaf.options.LogLevelOption.LogLevel;
 
 @RunWith(PaxExam.class)
+@Ignore
 public class Hibernate42CamelTest extends Assert {
 
     @Inject

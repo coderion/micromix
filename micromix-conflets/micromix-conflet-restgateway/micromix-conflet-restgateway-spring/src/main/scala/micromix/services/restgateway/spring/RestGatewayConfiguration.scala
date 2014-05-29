@@ -12,7 +12,7 @@ import org.jboss.netty.handler.codec.http.HttpRequest
 import com.fasterxml.jackson.databind.ObjectMapper.DefaultTyping
 import micromix.services.restgateway.api._
 import micromix.conflet.restgateway.FixedTokenAuthGatewayInterceptor
-import io.fabric8.process.spring.boot.actuator.camel.rest.{RestInterceptor, RestRequest}
+import io.fabric8.process.spring.boot.actuator.camel.rest.{RestPipeline, RestInterceptor, RestRequest}
 
 @Configuration
 class RestGatewayConfiguration {
@@ -26,7 +26,7 @@ class RestGatewayConfiguration {
 
 }
 
-class NettyGatewayEndpointRoute(gatewayInterceptor: RestInterceptor) extends InterceptedGatewayRequestDispatcher(gatewayInterceptor) with RoutesBuilder {
+class NettyGatewayEndpointRoute(gatewayInterceptor: RestInterceptor) extends RestPipeline[Exchange](gatewayInterceptor) with RoutesBuilder {
 
   @Autowired
   private var applicationContext: ApplicationContext = _
@@ -61,7 +61,7 @@ class NettyGatewayEndpointRoute(gatewayInterceptor: RestInterceptor) extends Int
               case None => throw new IllegalArgumentException("No such method")
             }
             try {
-              dispatch(x)
+              dispatch(x, exchange)
             } catch {
               case e: IllegalAccessException =>
                 exchange.getIn.setHeader("ACL_EXCEPTION", true)
@@ -86,6 +86,7 @@ class NettyGatewayEndpointRoute(gatewayInterceptor: RestInterceptor) extends Int
     })
   }
 
-  override def doDispatch(gatewayRequest: RestRequest) {}
+  protected override def doDispatch(restRequest: RestRequest, rsp: Exchange): Exchange =
+    rsp
 
 }

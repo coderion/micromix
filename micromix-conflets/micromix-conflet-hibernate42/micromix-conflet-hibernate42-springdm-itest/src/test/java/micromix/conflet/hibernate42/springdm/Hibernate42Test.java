@@ -4,6 +4,7 @@ import fuse.pocs.blueprint.openjpa.CustomRollbackException;
 import fuse.pocs.blueprint.openjpa.Person;
 import fuse.pocs.blueprint.openjpa.PersonService;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.Configuration;
@@ -24,6 +25,7 @@ import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.logLevel;
 import static org.ops4j.pax.exam.karaf.options.LogLevelOption.LogLevel;
 
 @RunWith(PaxExam.class)
+@Ignore
 public class Hibernate42Test extends Assert {
 
     @Inject
