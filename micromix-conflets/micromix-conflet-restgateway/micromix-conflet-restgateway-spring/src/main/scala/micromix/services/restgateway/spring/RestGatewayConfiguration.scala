@@ -42,7 +42,7 @@ class NettyGatewayEndpointRoute(gatewayInterceptor: RestInterceptor) extends Res
   def addRoutesToCamelContext(cc: CamelContext) {
     cc.addRoutes(new RouteBuilder() {
       override def configure() {
-        onException(classOf[java.lang.Exception]).handled(true).process(new Processor() {
+        onException(classOf[java.lang.Exception]).handled(true).to("log:rest-error?level=ERROR").process(new Processor() {
           override def process(exchange: Exchange) {
             exchange.getIn.setHeader("Access-Control-Allow-Origin", "*")
             exchange.getIn.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, " + FixedTokenAuthGatewayInterceptor.tokenHeader)
