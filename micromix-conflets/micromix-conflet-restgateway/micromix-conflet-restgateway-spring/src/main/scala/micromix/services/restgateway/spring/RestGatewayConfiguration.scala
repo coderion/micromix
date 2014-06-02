@@ -44,6 +44,8 @@ class NettyGatewayEndpointRoute(gatewayInterceptor: RestInterceptor) extends Res
       override def configure() {
         onException(classOf[java.lang.Exception]).handled(true).process(new Processor() {
           override def process(exchange: Exchange) {
+            exchange.getIn.setHeader("Access-Control-Allow-Origin", "*")
+            exchange.getIn.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, " + FixedTokenAuthGatewayInterceptor.tokenHeader)
             val ex = exchange.getProperty(Exchange.EXCEPTION_CAUGHT, classOf[java.lang.Exception])
             exchange.getIn.setBody(ex.getClass.getSimpleName + ": " + ex.getMessage)
           }
