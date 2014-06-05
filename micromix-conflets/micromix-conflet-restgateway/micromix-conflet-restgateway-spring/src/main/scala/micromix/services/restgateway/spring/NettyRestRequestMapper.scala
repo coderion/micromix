@@ -5,7 +5,7 @@ import org.jboss.netty.handler.codec.http.HttpRequest
 import scala.collection.JavaConversions._
 import io.fabric8.process.spring.boot.actuator.camel.rest.{RestRequestMapper, RestRequest}
 
-class NettyGatewayRequestMapper extends RestRequestMapper[HttpRequest] {
+class NettyRestRequestMapper extends RestRequestMapper[HttpRequest] {
 
   override def mapRequest(request: HttpRequest): RestRequest = {
     val headers = request.headers.iterator.foldLeft(Map[String, String]()) {
