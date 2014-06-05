@@ -10,15 +10,15 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.context.ApplicationContext
 import org.jboss.netty.handler.codec.http.HttpRequest
 import com.fasterxml.jackson.databind.ObjectMapper.DefaultTyping
-import micromix.services.restgateway.api._
 import micromix.conflet.restgateway.FixedTokenAuthGatewayInterceptor
-import io.fabric8.process.spring.boot.actuator.camel.rest.{RestRequestMapper, RestPipeline, RestInterceptor, RestRequest}
+import io.fabric8.process.spring.boot.actuator.camel.rest._
+import scala.Some
 
 @Configuration
 class RestGatewayConfiguration {
 
   @Autowired(required = false)
-  var gatewayInterceptor: RestInterceptor = new EnablingGatewayInterceptor
+  var gatewayInterceptor: RestInterceptor = new NopRestInterceptor
 
   @Bean
   def nettyGatewayEndpointRoute =
