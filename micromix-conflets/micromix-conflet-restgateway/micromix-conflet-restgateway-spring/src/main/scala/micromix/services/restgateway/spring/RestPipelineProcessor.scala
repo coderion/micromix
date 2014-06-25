@@ -38,8 +38,8 @@ class RestPipelineProcessor(restInterceptor: RestInterceptor) extends RestPipeli
     if (body.isEmpty) {
       exchange.getIn.setBody(x.parameters.zipWithIndex.map(p => exchange.getContext.getTypeConverter.convertTo(method.getParameterTypes()(p._2), p._1)))
     } else {
-      val parameterType = method.getParameterTypes()(0)
-      exchange.getIn.setBody(x.parameters :+ inputJsonMapper.readValue(body, parameterType))
+      val parameterType = method.getParameterTypes()(method.getParameterTypes().length-1)
+      exchange.getIn.setBody(x.parameters.zipWithIndex.map(p => exchange.getContext.getTypeConverter.convertTo(method.getParameterTypes()(p._2), p._1)) :+ inputJsonMapper.readValue(body, parameterType))
     }
     exchange.getIn.setHeader("bean", x.service)
     exchange.getIn.setHeader("method", x.operation)
