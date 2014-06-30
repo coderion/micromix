@@ -29,7 +29,7 @@ class RestPipelineProcessor(restInterceptor: RestInterceptor) extends RestPipeli
       case Some(m) => m
       case None => throw new IllegalArgumentException("No such method")
     }
-    if (method.getReturnType == classOf[Array[java.lang.Byte]]) {
+    if (method.getReturnType == classOf[Array[Byte]]) {
       exchange.getIn.setHeader("BINARY", true)
     }
     try {

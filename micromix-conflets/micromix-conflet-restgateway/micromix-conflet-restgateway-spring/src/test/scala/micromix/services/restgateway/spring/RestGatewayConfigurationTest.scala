@@ -1,16 +1,18 @@
 package micromix.services.restgateway.spring
 
-import org.junit.runner.RunWith
-import org.scalatest.junit.JUnitRunner
-import org.scalatest.FunSuite
 import java.net.URL
-import java.util.{List => JList}
-import java.util.{Map => JMap}
+import java.util.{List => JList, Map => JMap}
+
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.ObjectMapper.DefaultTyping
 import micromix.boot.spring.SpringBootSupportEnabled
+import org.apache.commons.io.IOUtils
+import org.junit.runner.RunWith
+import org.scalatest.FunSuite
+import org.scalatest.junit.JUnitRunner
+
 import scala.collection.JavaConversions._
 import scala.util.Random
-import com.fasterxml.jackson.databind.ObjectMapper.DefaultTyping
 
 @RunWith(classOf[JUnitRunner])
 class RestGatewayConfigurationTest extends FunSuite with SpringBootSupportEnabled {
@@ -62,6 +64,14 @@ class RestGatewayConfigurationTest extends FunSuite with SpringBootSupportEnable
       val httpPort = cachedProperties("micromix.services.restgateway.spring.netty.port")
       val is = new URL("http://localhost:" + httpPort + "/api/invoices/error").openStream
       readJsonMapper.readValue(is, classOf[String])
+    }
+  }
+
+  test("Should return bytes.") {
+    assertResult("bytes FTW!".getBytes) {
+      val httpPort = cachedProperties("micromix.services.restgateway.spring.netty.port")
+      val is = new URL("http://localhost:" + httpPort + "/api/invoices/download").openStream
+      IOUtils.toByteArray(is)
     }
   }
 

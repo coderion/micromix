@@ -1,9 +1,11 @@
 package micromix.services.restgateway.spring
 
-import scala.collection.JavaConversions._
 import java.io.Serializable
 import java.util
-import micromix.services.restgateway.api.{Returns, Param}
+
+import micromix.services.restgateway.api.{Param, Returns}
+
+import scala.collection.JavaConversions._
 
 class InvoicesService {
 
@@ -20,6 +22,9 @@ class InvoicesService {
   def error() {
     throw new RuntimeException("Error message!")
   }
+
+  def download: Array[Byte] =
+    "bytes FTW!".getBytes
 
 }
 

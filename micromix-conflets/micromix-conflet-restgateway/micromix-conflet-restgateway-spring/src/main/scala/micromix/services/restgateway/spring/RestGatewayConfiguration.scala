@@ -45,7 +45,7 @@ class NettyGatewayEndpointRoute(restPipelineProcessor: RestPipelineProcessor) ex
           process(restPipelineProcessor).
           choice().
           when(header("ACL_EXCEPTION").isEqualTo(true)).setBody().constant("ACCESS DENIED").endChoice().
-          when(header("BINARY").isNotNull).setHeader("ContentType", constant("application/octet-stream")).endChoice().
+          when(header("BINARY").isNotNull).recipientList().simple("bean:${headers.bean}?method=${headers.method}&multiParameterArray=true").setHeader("Content-Type", constant("application/octet-stream")).endChoice().
           otherwise().recipientList().simple("bean:${headers.bean}?method=${headers.method}&multiParameterArray=true").
           marshal().json(JsonLibrary.Jackson).log("${body}").endChoice()
       }
