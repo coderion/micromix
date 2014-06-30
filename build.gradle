@@ -22,9 +22,15 @@ subprojects {
         springTest = "org.springframework:spring-test:$springVersion"
     }
 
+
+
     // Releasing
     apply plugin: 'scala' // Workaround - scaladocJar needs this
     apply plugin: 'signing'
+
+    dependencies {
+        compile scalaLibrary
+    }
 
     ext.isReleaseVersion = !version.endsWith("-SNAPSHOT")
 
