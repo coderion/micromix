@@ -1,14 +1,14 @@
 package micromix.services.restgateway.spring
 
-import org.apache.camel.{Exchange, Processor}
-import org.apache.camel.component.netty.http.NettyHttpMessage
-import micromix.conflet.restgateway.FixedTokenAuthGatewayInterceptor
-import org.springframework.beans.factory.annotation.Autowired
-import io.fabric8.process.spring.boot.actuator.camel.rest.{RestInterceptor, RestPipeline, RestRequest, RestRequestMapper}
-import org.jboss.netty.handler.codec.http.HttpRequest
-import org.springframework.context.ApplicationContext
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.ObjectMapper.DefaultTyping
+import io.fabric8.process.spring.boot.actuator.camel.rest.{RestInterceptor, RestPipeline, RestRequest, RestRequestMapper}
+import micromix.conflet.restgateway.FixedTokenAuthGatewayInterceptor
+import org.apache.camel.component.netty.http.NettyHttpMessage
+import org.apache.camel.{Exchange, Processor}
+import org.jboss.netty.handler.codec.http.HttpRequest
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.context.ApplicationContext
 
 class RestPipelineProcessor(restInterceptor: RestInterceptor) extends RestPipeline[Exchange](restInterceptor) with Processor {
 
@@ -28,6 +28,9 @@ class RestPipelineProcessor(restInterceptor: RestInterceptor) extends RestPipeli
     val method = bean.getDeclaredMethods.find(_.getName == x.operation) match {
       case Some(m) => m
       case None => throw new IllegalArgumentException("No such method")
+    }
+    if (method.getReturnType == classOf[Array[java.lang.Byte]]) {
+      exchange.getIn.setHeader("BINARY", true)
     }
     try {
       dispatch(x, exchange)

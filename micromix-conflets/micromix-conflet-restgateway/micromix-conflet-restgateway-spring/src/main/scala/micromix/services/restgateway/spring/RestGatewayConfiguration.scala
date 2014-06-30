@@ -1,12 +1,12 @@
 package micromix.services.restgateway.spring
 
-import org.springframework.context.annotation.{Bean, Configuration}
-import org.apache.camel.{CamelContext, RoutesBuilder, Exchange, Processor}
-import org.springframework.beans.factory.annotation.{Value, Autowired}
+import io.fabric8.process.spring.boot.actuator.camel.rest._
+import micromix.conflet.restgateway.FixedTokenAuthGatewayInterceptor
 import org.apache.camel.builder.RouteBuilder
 import org.apache.camel.model.dataformat.JsonLibrary
-import micromix.conflet.restgateway.FixedTokenAuthGatewayInterceptor
-import io.fabric8.process.spring.boot.actuator.camel.rest._
+import org.apache.camel.{CamelContext, Exchange, Processor, RoutesBuilder}
+import org.springframework.beans.factory.annotation.{Autowired, Value}
+import org.springframework.context.annotation.{Bean, Configuration}
 
 @Configuration
 class RestGatewayConfiguration {
@@ -45,6 +45,7 @@ class NettyGatewayEndpointRoute(restPipelineProcessor: RestPipelineProcessor) ex
           process(restPipelineProcessor).
           choice().
           when(header("ACL_EXCEPTION").isEqualTo(true)).setBody().constant("ACCESS DENIED").endChoice().
+          when(header("BINARY").isNotNull).setHeader("ContentType", constant("application/octet-stream")).endChoice().
           otherwise().recipientList().simple("bean:${headers.bean}?method=${headers.method}&multiParameterArray=true").
           marshal().json(JsonLibrary.Jackson).log("${body}").endChoice()
       }
