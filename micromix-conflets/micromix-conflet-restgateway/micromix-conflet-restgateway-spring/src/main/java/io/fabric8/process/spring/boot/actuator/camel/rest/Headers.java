@@ -12,12 +12,20 @@ public class Headers {
         }
     };
 
-    public static void clear() {
-        headers.get().clear();
+    public static void header(String key, String value) {
+        headers.get().put(key, value);
+    }
+
+    public static String header(String key) {
+        return headers.get().get(key);
     }
 
     public static Map<String, String> headers() {
         return new HashMap<String, String>(headers.get());
+    }
+
+    public static void clear() {
+        headers.get().clear();
     }
 
     public static void contentDisposition(String contentDisposition) {
