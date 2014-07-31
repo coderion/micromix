@@ -8,6 +8,8 @@ import org.apache.camel.{CamelContext, Exchange, Processor, RoutesBuilder}
 import org.springframework.beans.factory.annotation.{Autowired, Value}
 import org.springframework.context.annotation.{Bean, Configuration}
 
+import scala.collection.JavaConversions._
+
 @Configuration
 class RestGatewayConfiguration {
 
@@ -45,9 +47,17 @@ class NettyGatewayEndpointRoute(restPipelineProcessor: RestPipelineProcessor) ex
           process(restPipelineProcessor).
           choice().
           when(header("ACL_EXCEPTION").isEqualTo(true)).setBody().constant("ACCESS DENIED").endChoice().
-          when(header("BINARY").isNotNull).recipientList().simple("bean:${headers.bean}?method=${headers.method}&multiParameterArray=true").setHeader("Content-Type", constant("application/octet-stream")).endChoice().
+          when(header("BINARY").isNotNull).recipientList().simple("bean:${headers.bean}?method=${headers.method}&multiParameterArray=true").setHeader("Content-Type", constant("application/octet-stream")).process(new Processor {
+          override def process(exchange: Exchange): Unit = {
+            Headers.headers().foreach(kv => exchange.getIn.setHeader(kv._1, kv._2))
+          }
+        }).endChoice().
           otherwise().recipientList().simple("bean:${headers.bean}?method=${headers.method}&multiParameterArray=true").
-          marshal().json(JsonLibrary.Jackson).log("${body}").endChoice()
+          marshal().json(JsonLibrary.Jackson).log("${body}").process(new Processor {
+          override def process(exchange: Exchange): Unit = {
+            Headers.headers().foreach(kv => exchange.getIn.setHeader(kv._1, kv._2))
+          }
+        }).endChoice()
       }
     })
   }

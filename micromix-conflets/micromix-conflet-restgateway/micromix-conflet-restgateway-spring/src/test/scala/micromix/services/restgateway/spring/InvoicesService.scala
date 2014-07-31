@@ -3,6 +3,7 @@ package micromix.services.restgateway.spring
 import java.io.Serializable
 import java.util
 
+import io.fabric8.process.spring.boot.actuator.camel.rest.Headers
 import micromix.services.restgateway.api.{Param, Returns}
 
 import scala.collection.JavaConversions._
@@ -23,8 +24,10 @@ class InvoicesService {
     throw new RuntimeException("Error message!")
   }
 
-  def download: Array[Byte] =
+  def download: Array[Byte] = {
+    Headers.contentDispositionFilename("file.bin")
     "bytes FTW!".getBytes
+  }
 
 }
 

@@ -2,7 +2,7 @@ package micromix.services.restgateway.spring
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.ObjectMapper.DefaultTyping
-import io.fabric8.process.spring.boot.actuator.camel.rest.{RestInterceptor, RestPipeline, RestRequest, RestRequestMapper}
+import io.fabric8.process.spring.boot.actuator.camel.rest._
 import micromix.conflet.restgateway.FixedTokenAuthGatewayInterceptor
 import org.apache.camel.component.netty.http.NettyHttpMessage
 import org.apache.camel.{Exchange, Processor}
@@ -21,6 +21,7 @@ class RestPipelineProcessor(restInterceptor: RestInterceptor) extends RestPipeli
   private val inputJsonMapper = new ObjectMapper().enableDefaultTyping(DefaultTyping.NON_FINAL)
 
   override def process(exchange: Exchange) {
+    Headers.clear()
     val request = exchange.getIn(classOf[NettyHttpMessage]).getHttpRequest
     val body = exchange.getIn.getBody(classOf[String])
     val x = gatewayRequestMapper.mapRequest(request)
