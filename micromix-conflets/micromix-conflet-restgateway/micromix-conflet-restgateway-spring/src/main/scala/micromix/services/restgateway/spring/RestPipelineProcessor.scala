@@ -20,6 +20,17 @@ class RestPipelineProcessor(restInterceptor: RestInterceptor) extends RestPipeli
 
   private val inputJsonMapper = new ObjectMapper().enableDefaultTyping(DefaultTyping.NON_FINAL)
 
+  private val plainInputJsonMapper = new ObjectMapper
+
+  private def resolveJsonMapper(exchange: Exchange) = {
+    val api = exchange.getIn.getHeader("PLAIN_API", classOf[String])
+    if (java.lang.Boolean.parseBoolean(api)) {
+      plainInputJsonMapper
+    } else {
+      inputJsonMapper
+    }
+  }
+
   override def process(exchange: Exchange) {
     Headers.clear()
     val request = exchange.getIn(classOf[NettyHttpMessage]).getHttpRequest
@@ -43,7 +54,7 @@ class RestPipelineProcessor(restInterceptor: RestInterceptor) extends RestPipeli
       exchange.getIn.setBody(x.parameters.zipWithIndex.map(p => exchange.getContext.getTypeConverter.convertTo(method.getParameterTypes()(p._2), p._1)))
     } else {
       val parameterType = method.getParameterTypes()(method.getParameterTypes().length-1)
-      exchange.getIn.setBody(x.parameters.zipWithIndex.map(p => exchange.getContext.getTypeConverter.convertTo(method.getParameterTypes()(p._2), p._1)) :+ inputJsonMapper.readValue(body, parameterType))
+      exchange.getIn.setBody(x.parameters.zipWithIndex.map(p => exchange.getContext.getTypeConverter.convertTo(method.getParameterTypes()(p._2), p._1)) :+ resolveJsonMapper(exchange).readValue(body, parameterType))
     }
     exchange.getIn.setHeader("bean", x.service)
     exchange.getIn.setHeader("method", x.operation)
