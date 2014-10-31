@@ -4,16 +4,17 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.ObjectMapper.DefaultTyping
 import io.fabric8.process.spring.boot.actuator.camel.rest._
 import micromix.conflet.restgateway.FixedTokenAuthGatewayInterceptor
+import org.apache.camel.component.netty.NettyConstants
 import org.apache.camel.component.netty.http.NettyHttpMessage
 import org.apache.camel.{Exchange, Processor}
-import org.jboss.netty.handler.codec.http.HttpRequest
+import org.jboss.netty.channel.ChannelHandlerContext
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.ApplicationContext
 
 class RestPipelineProcessor(restInterceptor: RestInterceptor) extends RestPipeline[Exchange](restInterceptor) with Processor {
 
   @Autowired(required = false)
-  var gatewayRequestMapper: RestRequestMapper[HttpRequest] = new NettyRestRequestMapper
+  var gatewayRequestMapper: RestRequestMapper[NettyRequest] = new NettyRestRequestMapper
 
   @Autowired
   private var applicationContext: ApplicationContext = _
@@ -34,8 +35,9 @@ class RestPipelineProcessor(restInterceptor: RestInterceptor) extends RestPipeli
   override def process(exchange: Exchange) {
     Headers.clear()
     val request = exchange.getIn(classOf[NettyHttpMessage]).getHttpRequest
+    val channelContext = exchange.getIn.getHeader(NettyConstants.NETTY_CHANNEL_HANDLER_CONTEXT, classOf[ChannelHandlerContext])
     val body = exchange.getIn.getBody(classOf[String])
-    val x = gatewayRequestMapper.mapRequest(request)
+    val x = gatewayRequestMapper.mapRequest(NettyRequest(request, channelContext))
     val bean = applicationContext.getBean(x.service).getClass
     val method = bean.getDeclaredMethods.find(_.getName == x.operation) match {
       case Some(m) => m

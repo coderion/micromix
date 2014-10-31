@@ -5,7 +5,7 @@ import org.junit.Test;
 
 public class AndRestInterceptorTest extends Assert {
 
-    RestRequest restRequest = new RestRequest("service", "operation");
+    RestRequest restRequest = new RestRequest("service", "operation", null);
 
     @Test
     public void shouldBePositive() {

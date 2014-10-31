@@ -1,5 +1,6 @@
 package io.fabric8.process.spring.boot.actuator.camel.rest;
 
+import java.net.SocketAddress;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -13,15 +14,18 @@ public class RestRequest {
 
     private final String[] parameters;
 
-    public RestRequest(Map<String, String> headers, String service, String operation, String... parameters) {
+    private final SocketAddress socketAddress;
+
+    public RestRequest(Map<String, String> headers, String service, String operation, SocketAddress socketAddress, String... parameters) {
         this.headers = headers;
         this.service = service;
         this.operation = operation;
         this.parameters = parameters;
+        this.socketAddress = socketAddress;
     }
 
-    public RestRequest(String service, String operation, String... parameters) {
-        this(new HashMap<String, String>(), service, operation, parameters);
+    public RestRequest(String service, String operation, SocketAddress socketAddress, String... parameters) {
+        this(new HashMap<String, String>(), service, operation, socketAddress, parameters);
     }
 
     public Map<String, String> headers() {
@@ -38,6 +42,10 @@ public class RestRequest {
 
     public String[] parameters() {
         return parameters;
+    }
+
+    public SocketAddress socketAddress() {
+        return socketAddress;
     }
 
 }

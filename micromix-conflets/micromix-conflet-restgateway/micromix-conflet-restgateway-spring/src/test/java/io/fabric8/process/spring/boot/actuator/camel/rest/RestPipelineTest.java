@@ -10,7 +10,7 @@ import static org.mockito.Mockito.verify;
 
 public class RestPipelineTest extends Assert {
 
-    RestRequest request = new RestRequest("service", "operation");
+    RestRequest request = new RestRequest("service", "operation", null);
 
     RestInterceptor interceptor = mock(RestInterceptor.class);
 
