@@ -63,6 +63,7 @@ class NettyGatewayEndpointRoute(restPipelineProcessor: RestPipelineProcessor) ex
         from("netty-http:http://0.0.0.0/api?matchOnUriPrefix=true&nettySharedHttpServer=#sharedNettyHttpServer").
           process(restPipelineProcessor).
           choice().
+          when(header(Exchange.HTTP_METHOD).isEqualTo("OPTIONS")).setBody().constant("").endChoice().
           when(header("ACL_EXCEPTION").isEqualTo(true)).setBody().constant("ACCESS DENIED").endChoice().
           when(header("BINARY").isNotNull).recipientList().simple("bean:${headers.bean}?method=${headers.method}&multiParameterArray=true").setHeader("Content-Type", constant("application/octet-stream")).process(new Processor {
           override def process(exchange: Exchange): Unit = {
