@@ -1,7 +1,7 @@
 allprojects {
     // Maven compatibility
     apply plugin: 'maven'
-    group = 'com.github.micromix'
+    group = 'pl.coderion.micromix'
     version = '0.11-SNAPSHOT'
 
     repositories {
@@ -27,6 +27,9 @@ subprojects {
     // Releasing
     apply plugin: 'scala' // Workaround - scaladocJar needs this
     apply plugin: 'signing'
+
+    sourceCompatibility = '1.7'
+    targetCompatibility = '1.7'
 
     dependencies {
         compile scalaLibrary
@@ -60,7 +63,7 @@ subprojects {
             mavenDeployer {
                 beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
 
-                def snapshotRepo = 'https://oss.sonatype.org/content/repositories/snapshots/'
+                def snapshotRepo = 'http://nexus.coderion.pl/nexus/content/repositories/snapshots/'
                 def releaseRepo = 'https://oss.sonatype.org/service/local/staging/deploy/maven2/'
                 repository(url: isReleaseVersion ? releaseRepo : snapshotRepo) {
                     authentication(userName: sonatypeUsername, password: sonatypePassword)
