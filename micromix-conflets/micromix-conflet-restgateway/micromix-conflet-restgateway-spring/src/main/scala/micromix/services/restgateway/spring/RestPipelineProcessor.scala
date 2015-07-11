@@ -47,7 +47,9 @@ class RestPipelineProcessor(restInterceptor: RestInterceptor) extends RestPipeli
       exchange.getIn.setHeader("BINARY", true)
     }
     try {
-      dispatch(x, exchange)
+      if (!exchange.getIn.getHeader(Exchange.HTTP_METHOD).toString.equalsIgnoreCase("OPTIONS")) {
+        dispatch(x, exchange)
+      }
     } catch {
       case e: IllegalAccessException =>
         exchange.getIn.setHeader("ACL_EXCEPTION", true)

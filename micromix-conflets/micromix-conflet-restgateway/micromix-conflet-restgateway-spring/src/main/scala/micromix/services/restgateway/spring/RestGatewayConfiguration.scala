@@ -5,7 +5,7 @@ import micromix.conflet.restgateway.FixedTokenAuthGatewayInterceptor
 import org.apache.camel.builder.RouteBuilder
 import org.apache.camel.component.netty.http.{DefaultNettySharedHttpServer, NettySharedHttpServerBootstrapConfiguration}
 import org.apache.camel.model.dataformat.JsonLibrary
-import org.apache.camel.{CamelContext, Exchange, Processor, RoutesBuilder}
+import org.apache.camel.{CamelContext, Exchange, Processor, RoutesBuilder,LoggingLevel}
 import org.springframework.beans.factory.annotation.{Autowired, Value}
 import org.springframework.context.annotation.{Bean, Configuration}
 
@@ -57,6 +57,7 @@ class NettyGatewayEndpointRoute(restPipelineProcessor: RestPipelineProcessor) ex
             exchange.getIn.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, " + FixedTokenAuthGatewayInterceptor.tokenHeader)
             val ex = exchange.getProperty(Exchange.EXCEPTION_CAUGHT, classOf[java.lang.Exception])
             exchange.getIn.setBody(ex.getClass.getSimpleName + ": " + ex.getMessage)
+            log.error("opis bledu: " + ex.getMessage)
           }
         }).marshal().json(JsonLibrary.Jackson)
 
@@ -71,7 +72,7 @@ class NettyGatewayEndpointRoute(restPipelineProcessor: RestPipelineProcessor) ex
           }
         }).endChoice().
           otherwise().recipientList().simple("bean:${headers.bean}?method=${headers.method}&multiParameterArray=true").
-          marshal().json(JsonLibrary.Jackson).log("${body}").process(new Processor {
+          marshal().json(JsonLibrary.Jackson).log(LoggingLevel.DEBUG,"${body}").process(new Processor {
           override def process(exchange: Exchange): Unit = {
             Headers.headers().foreach(kv => exchange.getIn.setHeader(kv._1, kv._2))
           }
