@@ -54,7 +54,8 @@ class NettyGatewayEndpointRoute(restPipelineProcessor: RestPipelineProcessor) ex
         onException(classOf[java.lang.Exception]).handled(true).to("log:rest-error?level=ERROR").process(new Processor() {
           override def process(exchange: Exchange) {
             exchange.getIn.setHeader("Access-Control-Allow-Origin", "*")
-            exchange.getIn.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, " + FixedTokenAuthGatewayInterceptor.tokenHeader)
+            exchange.getIn.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, " +
+              FixedTokenAuthGatewayInterceptor.tokenHeader + ", " + FixedTokenAuthGatewayInterceptor.plainApiHeader)
             val ex = exchange.getProperty(Exchange.EXCEPTION_CAUGHT, classOf[java.lang.Exception])
             exchange.getIn.setBody(ex.getClass.getSimpleName + ": " + ex.getMessage)
             log.error("opis bledu: " + ex.getMessage)

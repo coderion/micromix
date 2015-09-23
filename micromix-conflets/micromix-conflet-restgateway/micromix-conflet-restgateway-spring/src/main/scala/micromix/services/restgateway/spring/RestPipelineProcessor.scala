@@ -63,7 +63,8 @@ class RestPipelineProcessor(restInterceptor: RestInterceptor) extends RestPipeli
     exchange.getIn.setHeader("bean", x.service)
     exchange.getIn.setHeader("method", x.operation)
     exchange.getIn.setHeader("Access-Control-Allow-Origin", "*")
-    exchange.getIn.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, " + FixedTokenAuthGatewayInterceptor.tokenHeader)
+    exchange.getIn.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, " +
+      FixedTokenAuthGatewayInterceptor.tokenHeader  + ", " + FixedTokenAuthGatewayInterceptor.plainApiHeader)
   }
 
   protected override def doDispatch(restRequest: RestRequest, rsp: Exchange): Exchange =
