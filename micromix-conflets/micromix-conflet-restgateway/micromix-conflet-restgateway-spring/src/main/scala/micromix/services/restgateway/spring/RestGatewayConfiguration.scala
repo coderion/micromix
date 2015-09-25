@@ -5,7 +5,7 @@ import micromix.conflet.restgateway.FixedTokenAuthGatewayInterceptor
 import org.apache.camel.builder.RouteBuilder
 import org.apache.camel.component.netty.http.{DefaultNettySharedHttpServer, NettySharedHttpServerBootstrapConfiguration}
 import org.apache.camel.model.dataformat.JsonLibrary
-import org.apache.camel.{CamelContext, Exchange, Processor, RoutesBuilder,LoggingLevel}
+import org.apache.camel.{CamelContext, Exchange, Processor, RoutesBuilder, LoggingLevel}
 import org.springframework.beans.factory.annotation.{Autowired, Value}
 import org.springframework.context.annotation.{Bean, Configuration}
 
@@ -17,6 +17,9 @@ class RestGatewayConfiguration {
   @Value("${micromix.services.restgateway.spring.netty.port:18080}")
   var port: Int = _
 
+  @Value("${micromix.api.mode:PRODUCTION}")
+  var apiMode: String = _
+
   @Value("${micromix.services.restgateway.spring.netty.chunkedMaxContentLength:26214400}")
   var chunkedMaxContentLength: Int = _
 
@@ -25,7 +28,7 @@ class RestGatewayConfiguration {
 
   @Bean
   def nettyGatewayEndpointRoute =
-    new NettyGatewayEndpointRoute(pipelineProcessor)
+    new NettyGatewayEndpointRoute(pipelineProcessor, apiMode)
 
   @Bean
   def pipelineProcessor =
@@ -44,7 +47,7 @@ class RestGatewayConfiguration {
 
 }
 
-class NettyGatewayEndpointRoute(restPipelineProcessor: RestPipelineProcessor) extends RoutesBuilder {
+class NettyGatewayEndpointRoute(restPipelineProcessor: RestPipelineProcessor, apiMode: String) extends RoutesBuilder {
 
   def addRoutesToCamelContext(cc: CamelContext) {
     cc.addRoutes(new RouteBuilder() {
@@ -57,7 +60,17 @@ class NettyGatewayEndpointRoute(restPipelineProcessor: RestPipelineProcessor) ex
             exchange.getIn.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, " +
               FixedTokenAuthGatewayInterceptor.tokenHeader + ", " + FixedTokenAuthGatewayInterceptor.plainApiHeader)
             val ex = exchange.getProperty(Exchange.EXCEPTION_CAUGHT, classOf[java.lang.Exception])
-            exchange.getIn.setBody(ex.getClass.getSimpleName + ": " + ex.getMessage)
+            if (apiMode.equalsIgnoreCase("PRODUCTION")) {
+              if (ex.getClass.getSimpleName.equalsIgnoreCase("DisabledException") ||
+                ex.getClass.getSimpleName.equalsIgnoreCase("BadCredentialsException") ||
+                ex.getClass.getSimpleName.equalsIgnoreCase("LoginMismatchedException")) {
+                exchange.getIn.setBody(ex.getClass.getSimpleName + ": " + ex.getMessage)
+              } else {
+                exchange.getIn.setBody("ApiException: API Error")
+              }
+            } else {
+              exchange.getIn.setBody(ex.getClass.getSimpleName + ": " + ex.getMessage)
+            }
             log.error("opis bledu: " + ex.getMessage)
           }
         }).marshal().json(JsonLibrary.Jackson)
