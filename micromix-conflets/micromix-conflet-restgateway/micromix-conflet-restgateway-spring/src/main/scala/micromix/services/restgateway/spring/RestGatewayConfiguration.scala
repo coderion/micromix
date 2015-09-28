@@ -63,6 +63,7 @@ class NettyGatewayEndpointRoute(restPipelineProcessor: RestPipelineProcessor, ap
             if (apiMode.equalsIgnoreCase("PRODUCTION")) {
               if (ex.getClass.getSimpleName.equalsIgnoreCase("DisabledException") ||
                 ex.getClass.getSimpleName.equalsIgnoreCase("BadCredentialsException") ||
+                ex.getClass.getSimpleName.equalsIgnoreCase("GeneralSecurityException") ||
                 ex.getClass.getSimpleName.equalsIgnoreCase("LoginMismatchedException")) {
                 exchange.getIn.setBody(ex.getClass.getSimpleName + ": " + ex.getMessage)
               } else {
