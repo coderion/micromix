@@ -50,6 +50,7 @@ class RestGatewayConfiguration {
 class NettyGatewayEndpointRoute(restPipelineProcessor: RestPipelineProcessor, apiMode: String) extends RoutesBuilder {
 
   def addRoutesToCamelContext(cc: CamelContext) {
+    cc.setUseBreadcrumb(false)
     cc.addRoutes(new RouteBuilder() {
       override def configure() {
 

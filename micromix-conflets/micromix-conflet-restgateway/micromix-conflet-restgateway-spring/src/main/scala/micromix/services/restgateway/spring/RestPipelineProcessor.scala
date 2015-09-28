@@ -32,8 +32,29 @@ class RestPipelineProcessor(restInterceptor: RestInterceptor) extends RestPipeli
     }
   }
 
+  private def headerCleaner(exchange: Exchange) = {
+
+    if (exchange.getIn.getHeaders.get("Location") != null ) {
+      exchange.getIn.getHeaders.remove("Location")
+    }
+
+//    if (exchange.getIn.getHeaders.get("Content-Type") != null ) {
+//      exchange.getIn.getHeaders.remove("Content-Type")
+//    }
+
+    if (exchange.getIn.getHeaders.get("Set-Cookie") != null ) {
+      exchange.getIn.getHeaders.remove("Set-Cookie")
+    }
+
+    if (exchange.getIn.getHeaders.get("Cookie") != null ) {
+      exchange.getIn.getHeaders.remove("Cookie")
+    }
+
+  }
+
   override def process(exchange: Exchange) {
     Headers.clear()
+    headerCleaner(exchange)
     val request = exchange.getIn(classOf[NettyHttpMessage]).getHttpRequest
     val channelContext = exchange.getIn.getHeader(NettyConstants.NETTY_CHANNEL_HANDLER_CONTEXT, classOf[ChannelHandlerContext])
     val body = exchange.getIn.getBody(classOf[String])
