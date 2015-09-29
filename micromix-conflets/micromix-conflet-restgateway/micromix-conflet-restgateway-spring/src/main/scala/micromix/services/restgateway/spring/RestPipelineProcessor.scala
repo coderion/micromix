@@ -39,11 +39,13 @@ class RestPipelineProcessor(restInterceptor: RestInterceptor) extends RestPipeli
 
     exchange.getIn.getHeaders.foreach(kv => {
       var key = kv._1
-      if(key.contains("\t") || key.contains("\r") || key.contains("\n") ) {
+      if (key.contains("\t") || key.contains("\r") || key.contains("\n")) {
         exchange.getIn.getHeaders.remove(key)
       }
-      if(kv._2.toString.contains("\t") || kv._2.toString.contains("\r") || kv._2.toString.contains("\n") ) {
-        exchange.getIn.getHeaders.remove(key)
+      if (kv._2 != null) {
+        if (kv._2.toString.contains("\t") || kv._2.toString.contains("\r") || kv._2.toString.contains("\n")) {
+          exchange.getIn.getHeaders.remove(key)
+        }
       }
     })
 
