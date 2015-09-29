@@ -1,5 +1,7 @@
 package micromix.services.restgateway.spring
 
+import scala.collection.JavaConversions._
+
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.ObjectMapper.DefaultTyping
 import io.fabric8.process.spring.boot.actuator.camel.rest._
@@ -33,6 +35,17 @@ class RestPipelineProcessor(restInterceptor: RestInterceptor) extends RestPipeli
   }
 
   private def headerCleaner(exchange: Exchange) = {
+
+
+    exchange.getIn.getHeaders.foreach(kv => {
+      var key = kv._1
+      if(key.contains("\t") || key.contains("\r") || key.contains("\n") ) {
+        exchange.getIn.getHeaders.remove(key)
+      }
+      if(kv._2.toString.contains("\t") || kv._2.toString.contains("\r") || kv._2.toString.contains("\n") ) {
+        exchange.getIn.getHeaders.remove(key)
+      }
+    })
 
     if (exchange.getIn.getHeaders.get("Location") != null ) {
       exchange.getIn.getHeaders.remove("Location")
