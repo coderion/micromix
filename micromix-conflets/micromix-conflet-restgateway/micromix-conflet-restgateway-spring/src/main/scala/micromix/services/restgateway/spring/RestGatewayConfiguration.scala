@@ -1,11 +1,15 @@
 package micromix.services.restgateway.spring
 
+import java.util.UUID
+
 import io.fabric8.process.spring.boot.actuator.camel.rest._
 import micromix.conflet.restgateway.FixedTokenAuthGatewayInterceptor
 import org.apache.camel.builder.RouteBuilder
-import org.apache.camel.component.netty.http.{DefaultNettySharedHttpServer, NettySharedHttpServerBootstrapConfiguration}
+import org.apache.camel.component.netty.NettyConstants
+import org.apache.camel.component.netty.http.{NettyHttpMessage, DefaultNettySharedHttpServer, NettySharedHttpServerBootstrapConfiguration}
 import org.apache.camel.model.dataformat.JsonLibrary
-import org.apache.camel.{CamelContext, Exchange, Processor, RoutesBuilder, LoggingLevel}
+import org.apache.camel.{CamelContext, Exchange, Processor, RoutesBuilder, LoggingLevel, Predicate}
+import org.jboss.netty.channel.ChannelHandlerContext
 import org.springframework.beans.factory.annotation.{Autowired, Value}
 import org.springframework.context.annotation.{Bean, Configuration}
 
@@ -20,6 +24,9 @@ class RestGatewayConfiguration {
   @Value("${micromix.api.mode:PRODUCTION}")
   var apiMode: String = _
 
+  @Value("${micromix.api.logging:false}")
+  var apiLogging: Boolean = _
+
   @Value("${micromix.services.restgateway.spring.netty.chunkedMaxContentLength:26214400}")
   var chunkedMaxContentLength: Int = _
 
@@ -28,7 +35,7 @@ class RestGatewayConfiguration {
 
   @Bean
   def nettyGatewayEndpointRoute =
-    new NettyGatewayEndpointRoute(pipelineProcessor, apiMode)
+    new NettyGatewayEndpointRoute(pipelineProcessor, apiMode, apiLogging)
 
   @Bean
   def pipelineProcessor =
@@ -47,13 +54,19 @@ class RestGatewayConfiguration {
 
 }
 
-class NettyGatewayEndpointRoute(restPipelineProcessor: RestPipelineProcessor, apiMode: String) extends RoutesBuilder {
+class NettyGatewayEndpointRoute(restPipelineProcessor: RestPipelineProcessor, apiMode: String, apiLogging: Boolean) extends RoutesBuilder {
 
+  var ID: String = "ID"
   def addRoutesToCamelContext(cc: CamelContext) {
+
     cc.setUseBreadcrumb(false)
     cc.addRoutes(new RouteBuilder() {
-      override def configure() {
 
+      def loggingCondition: Predicate = new Predicate {
+        override def matches(exchange: Exchange): Boolean = apiLogging
+      }
+
+      override def configure() {
 
         onException(classOf[java.lang.Exception]).handled(true).to("log:rest-error?level=ERROR").process(new Processor() {
           override def process(exchange: Exchange) {
@@ -73,11 +86,21 @@ class NettyGatewayEndpointRoute(restPipelineProcessor: RestPipelineProcessor, ap
             } else {
               exchange.getIn.setBody(ex.getClass.getSimpleName + ": " + ex.getMessage)
             }
-            log.error("opis bledu: " + ex.getMessage)
+            if (exchange.getProperties.containsKey(ID)) {
+              log.error("ERROR ID {} {} ", exchange.getProperty(ID), ex.getMessage)
+            } else {
+              log.error("opis bledu: " + ex.getMessage)
+            }
           }
         }).marshal().json(JsonLibrary.Jackson)
 
         from("netty-http:http://0.0.0.0/api?matchOnUriPrefix=true&nettySharedHttpServer=#sharedNettyHttpServer").
+          process(new Processor() {
+            override def process(exchange: Exchange) {
+              exchange.setProperty(ID , UUID.randomUUID().toString)
+            }
+          }).
+          wireTap("direct:requestLog").
           process(restPipelineProcessor).
           choice().
           when(header(Exchange.HTTP_METHOD).isEqualTo("OPTIONS")).setBody().constant("").endChoice().
@@ -92,7 +115,28 @@ class NettyGatewayEndpointRoute(restPipelineProcessor: RestPipelineProcessor, ap
           override def process(exchange: Exchange): Unit = {
             Headers.headers().foreach(kv => exchange.getIn.setHeader(kv._1, kv._2))
           }
-        }).endChoice()
+        }).endChoice().
+          wireTap("direct:responseLog")
+
+        from("direct:requestLog").filter(loggingCondition).process(new Processor() {
+          override def process(exchange: Exchange) {
+            val request = exchange.getIn(classOf[NettyHttpMessage]).getHttpRequest
+            val channelContext = exchange.getIn.getHeader(NettyConstants.NETTY_CHANNEL_HANDLER_CONTEXT, classOf[ChannelHandlerContext])
+
+            log.info("ID {} Client IP {} ", exchange.getProperty(ID), channelContext.getChannel.getRemoteAddress)
+            log.info("ID {} {} ", exchange.getProperty(ID), request.toString.replace("\n", " "))
+            if (request.getContent != null) {
+              log.info("ID {} {} ", exchange.getProperty(ID), new String(request.getContent.array()).replace("\n", " "))
+            }
+          }
+        })
+
+        from("direct:responseLog").filter(loggingCondition).process(new Processor() {
+          override def process(exchange: Exchange) {
+            val response = exchange.getIn.getBody(classOf[String])
+            log.info("ID {} {} ", exchange.getProperty(ID), response)
+          }
+        })
       }
     })
   }

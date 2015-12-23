@@ -72,7 +72,7 @@ class RestPipelineProcessor(restInterceptor: RestInterceptor) extends RestPipeli
     headerCleaner(exchange)
     val request = exchange.getIn(classOf[NettyHttpMessage]).getHttpRequest
     val channelContext = exchange.getIn.getHeader(NettyConstants.NETTY_CHANNEL_HANDLER_CONTEXT, classOf[ChannelHandlerContext])
-    val body = exchange.getIn.getBody(classOf[String])
+    val body = new String(request.getContent.array())
     val x = gatewayRequestMapper.mapRequest(NettyRequest(request, channelContext))
     val bean = applicationContext.getBean(x.service).getClass
     val method = bean.getDeclaredMethods.find(_.getName == x.operation) match {
