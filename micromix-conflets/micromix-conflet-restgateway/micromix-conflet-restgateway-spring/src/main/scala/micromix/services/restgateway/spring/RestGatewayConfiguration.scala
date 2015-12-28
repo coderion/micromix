@@ -9,6 +9,7 @@ import org.apache.camel.component.netty.NettyConstants
 import org.apache.camel.component.netty.http.{NettyHttpMessage, DefaultNettySharedHttpServer, NettySharedHttpServerBootstrapConfiguration}
 import org.apache.camel.model.dataformat.JsonLibrary
 import org.apache.camel.{CamelContext, Exchange, Processor, RoutesBuilder, LoggingLevel, Predicate}
+import org.jboss.netty.buffer.CompositeChannelBuffer
 import org.jboss.netty.channel.ChannelHandlerContext
 import org.springframework.beans.factory.annotation.{Autowired, Value}
 import org.springframework.context.annotation.{Bean, Configuration}
@@ -124,9 +125,14 @@ class NettyGatewayEndpointRoute(restPipelineProcessor: RestPipelineProcessor, ap
             val channelContext = exchange.getIn.getHeader(NettyConstants.NETTY_CHANNEL_HANDLER_CONTEXT, classOf[ChannelHandlerContext])
 
             log.info("ID {} Client IP {} ", exchange.getProperty(ID), channelContext.getChannel.getRemoteAddress)
-            log.info("ID {} {} ", exchange.getProperty(ID), request.toString.replace("\n", " "))
-            if (request.getContent != null) {
-              log.info("ID {} {} ", exchange.getProperty(ID), new String(request.getContent.array()).replace("\n", " "))
+
+            if (request.getContent != null && !request.getContent.isInstanceOf[CompositeChannelBuffer]) {
+              log.info("ID {} {} ", exchange.getProperty(ID), request.toString.replace("\n", " "))
+              if (request.getContent != null && !request.getContent.isInstanceOf[CompositeChannelBuffer]) {
+                log.info("ID {} {} ", exchange.getProperty(ID), new String(request.getContent.array()).replace("\n", " "))
+              }
+            } else {
+              log.info("ID {} {} ", exchange.getProperty(ID), request.getUri)
             }
           }
         })
