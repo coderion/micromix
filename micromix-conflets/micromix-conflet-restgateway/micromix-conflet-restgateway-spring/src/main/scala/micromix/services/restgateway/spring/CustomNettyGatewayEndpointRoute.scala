@@ -1,5 +1,6 @@
 package micromix.services.restgateway.spring
 
+import java.net.InetSocketAddress
 import java.nio.charset.Charset
 
 import io.fabric8.process.spring.boot.actuator.camel.rest.Headers
@@ -82,11 +83,12 @@ class CustomNettyGatewayEndpointRoute(val nettyServerName: String, val contextPa
             override def process(exchange: Exchange) {
               val request = exchange.getIn(classOf[NettyHttpMessage]).getHttpRequest
               val channelContext = exchange.getIn.getHeader(NettyConstants.NETTY_CHANNEL_HANDLER_CONTEXT, classOf[ChannelHandlerContext])
+              val socketAddress = channelContext.getChannel.getRemoteAddress.asInstanceOf[InetSocketAddress]
 
               exchange.getIn().setHeader(LoggingHeaders.REQUEST_METHOD, request.getMethod)
               exchange.getIn().setHeader(LoggingHeaders.REQUEST_URI, request.getUri)
               exchange.getIn().setHeader(LoggingHeaders.REQUEST_HEADERS, request.headers().entries().map(entry => entry.getKey + "->" + entry.getValue).mkString(", "))
-              exchange.getIn().setHeader(LoggingHeaders.REMOTE, channelContext.getChannel.getRemoteAddress)
+              exchange.getIn().setHeader(LoggingHeaders.REMOTE, socketAddress.getAddress.getHostAddress)
               exchange.getIn().setHeader(LoggingHeaders.REQUEST_BODY, "NONE OR HIDDEN")
 
               if (request.getContent != null && !request.getContent.isInstanceOf[CompositeChannelBuffer] &&
