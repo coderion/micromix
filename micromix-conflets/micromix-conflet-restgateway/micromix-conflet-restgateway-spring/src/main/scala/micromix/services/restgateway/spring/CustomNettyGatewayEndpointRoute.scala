@@ -12,6 +12,7 @@ import org.apache.camel.{LoggingLevel, _}
 import org.apache.camel.model.dataformat.JsonLibrary
 import org.jboss.netty.buffer.CompositeChannelBuffer
 import org.jboss.netty.channel.ChannelHandlerContext
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.{Autowired, Value}
 
 import scala.collection.JavaConversions._
@@ -43,6 +44,8 @@ class CustomNettyGatewayEndpointRoute(val nettyServerName: String, val contextPa
 
     cc.setUseBreadcrumb(false)
     cc.addRoutes(new RouteBuilder() {
+
+      val LOGGER = LoggerFactory.getLogger(contextPath)
 
       def loggingCondition: Predicate = new Predicate {
         override def matches(exchange: Exchange): Boolean = apiLogging
@@ -133,7 +136,7 @@ class CustomNettyGatewayEndpointRoute(val nettyServerName: String, val contextPa
               exchange.getIn().getHeader(LoggingHeaders.REQUEST_BODY),
               exchange.getIn().getHeader(LoggingHeaders.RESPONSE_BODY)
             )
-            log.info(message)
+            LOGGER.info(message)
           }
         })
 
@@ -150,7 +153,7 @@ class CustomNettyGatewayEndpointRoute(val nettyServerName: String, val contextPa
               exchange.getIn().getHeader(LoggingHeaders.REQUEST_BODY),
               ex.getClass.getSimpleName + ": " + ex.getMessage
             )
-            log.error(message)
+            LOGGER.error(message)
           }
         })
 
