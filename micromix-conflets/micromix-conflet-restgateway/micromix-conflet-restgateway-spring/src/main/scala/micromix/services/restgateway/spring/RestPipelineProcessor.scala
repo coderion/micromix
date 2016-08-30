@@ -1,19 +1,17 @@
 package micromix.services.restgateway.spring
 
-import org.jboss.netty.buffer.CompositeChannelBuffer
-
-import scala.collection.JavaConversions._
-
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.ObjectMapper.DefaultTyping
 import io.fabric8.process.spring.boot.actuator.camel.rest._
-import micromix.conflet.restgateway.FixedTokenAuthGatewayInterceptor
 import org.apache.camel.component.netty.NettyConstants
 import org.apache.camel.component.netty.http.NettyHttpMessage
 import org.apache.camel.{Exchange, Processor}
+import org.jboss.netty.buffer.CompositeChannelBuffer
 import org.jboss.netty.channel.ChannelHandlerContext
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.ApplicationContext
+
+import scala.collection.JavaConversions._
 
 class RestPipelineProcessor(restInterceptor: RestInterceptor) extends RestPipeline[Exchange](restInterceptor) with Processor {
 
@@ -105,9 +103,6 @@ class RestPipelineProcessor(restInterceptor: RestInterceptor) extends RestPipeli
     }
     exchange.getIn.setHeader("bean", x.service)
     exchange.getIn.setHeader("method", x.operation)
-    exchange.getIn.setHeader("Access-Control-Allow-Origin", "*")
-    exchange.getIn.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, " +
-      FixedTokenAuthGatewayInterceptor.tokenHeader  + ", " + FixedTokenAuthGatewayInterceptor.plainApiHeader)
   }
 
   protected override def doDispatch(restRequest: RestRequest, rsp: Exchange): Exchange =

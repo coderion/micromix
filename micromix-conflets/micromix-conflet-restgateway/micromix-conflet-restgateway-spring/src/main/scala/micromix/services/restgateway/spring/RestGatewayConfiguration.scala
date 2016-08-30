@@ -3,12 +3,11 @@ package micromix.services.restgateway.spring
 import java.util.UUID
 
 import io.fabric8.process.spring.boot.actuator.camel.rest._
-import micromix.conflet.restgateway.FixedTokenAuthGatewayInterceptor
 import org.apache.camel.builder.RouteBuilder
 import org.apache.camel.component.netty.NettyConstants
-import org.apache.camel.component.netty.http.{NettyHttpMessage, DefaultNettySharedHttpServer, NettySharedHttpServerBootstrapConfiguration}
+import org.apache.camel.component.netty.http.{DefaultNettySharedHttpServer, NettyHttpMessage, NettySharedHttpServerBootstrapConfiguration}
 import org.apache.camel.model.dataformat.JsonLibrary
-import org.apache.camel.{CamelContext, Exchange, Processor, RoutesBuilder, LoggingLevel, Predicate}
+import org.apache.camel.{Headers => _, _}
 import org.jboss.netty.buffer.CompositeChannelBuffer
 import org.jboss.netty.channel.ChannelHandlerContext
 import org.springframework.beans.factory.annotation.{Autowired, Value}
@@ -69,30 +68,29 @@ class NettyGatewayEndpointRoute(restPipelineProcessor: RestPipelineProcessor, ap
 
       override def configure() {
 
-        onException(classOf[java.lang.Exception]).handled(true).to("log:rest-error?level=ERROR").process(new Processor() {
-          override def process(exchange: Exchange) {
-            exchange.getIn.setHeader("Access-Control-Allow-Origin", "*")
-            exchange.getIn.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, " +
-              FixedTokenAuthGatewayInterceptor.tokenHeader + ", " + FixedTokenAuthGatewayInterceptor.plainApiHeader)
-            val ex = exchange.getProperty(Exchange.EXCEPTION_CAUGHT, classOf[java.lang.Exception])
-            if (apiMode.equalsIgnoreCase("PRODUCTION")) {
-              if (ex.getClass.getSimpleName.equalsIgnoreCase("DisabledException") ||
-                ex.getClass.getSimpleName.equalsIgnoreCase("BadCredentialsException") ||
-                ex.getClass.getSimpleName.equalsIgnoreCase("GeneralSecurityException") ||
-                ex.getClass.getSimpleName.equalsIgnoreCase("LoginMismatchedException")) {
-                exchange.getIn.setBody(ex.getClass.getSimpleName + ": " + ex.getMessage)
+        onException(classOf[java.lang.Exception]).handled(true).to("log:rest-error?level=ERROR").
+          process(new SecurityPipelineProcessor()).
+          process(new Processor() {
+            override def process(exchange: Exchange) {
+              val ex = exchange.getProperty(Exchange.EXCEPTION_CAUGHT, classOf[java.lang.Exception])
+              if (apiMode.equalsIgnoreCase("PRODUCTION")) {
+                if (ex.getClass.getSimpleName.equalsIgnoreCase("DisabledException") ||
+                  ex.getClass.getSimpleName.equalsIgnoreCase("BadCredentialsException") ||
+                  ex.getClass.getSimpleName.equalsIgnoreCase("GeneralSecurityException") ||
+                  ex.getClass.getSimpleName.equalsIgnoreCase("LoginMismatchedException")) {
+                  exchange.getIn.setBody(ex.getClass.getSimpleName + ": " + ex.getMessage)
+                } else {
+                  exchange.getIn.setBody("ApiException: API Error")
+                }
               } else {
-                exchange.getIn.setBody("ApiException: API Error")
+                exchange.getIn.setBody(ex.getClass.getSimpleName + ": " + ex.getMessage)
               }
-            } else {
-              exchange.getIn.setBody(ex.getClass.getSimpleName + ": " + ex.getMessage)
+              if (exchange.getProperties.containsKey(ID)) {
+                log.error("ERROR ID {} {} ", exchange.getProperty(ID), ex.getMessage)
+              } else {
+                log.error("opis bledu: " + ex.getMessage)
+              }
             }
-            if (exchange.getProperties.containsKey(ID)) {
-              log.error("ERROR ID {} {} ", exchange.getProperty(ID), ex.getMessage)
-            } else {
-              log.error("opis bledu: " + ex.getMessage)
-            }
-          }
         }).marshal().json(JsonLibrary.Jackson)
 
         from("netty-http:http://0.0.0.0/api?matchOnUriPrefix=true&nettySharedHttpServer=#sharedNettyHttpServer").
@@ -102,6 +100,7 @@ class NettyGatewayEndpointRoute(restPipelineProcessor: RestPipelineProcessor, ap
             }
           }).
           wireTap("direct:requestLog").
+          process(new SecurityPipelineProcessor()).
           process(restPipelineProcessor).
           choice().
           when(header(Exchange.HTTP_METHOD).isEqualTo("OPTIONS")).setBody().constant("").endChoice().

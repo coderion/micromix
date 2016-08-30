@@ -8,8 +8,8 @@ import micromix.conflet.restgateway.FixedTokenAuthGatewayInterceptor
 import org.apache.camel.builder.RouteBuilder
 import org.apache.camel.component.netty.NettyConstants
 import org.apache.camel.component.netty.http.NettyHttpMessage
-import org.apache.camel.{LoggingLevel, _}
 import org.apache.camel.model.dataformat.JsonLibrary
+import org.apache.camel.{LoggingLevel, _}
 import org.jboss.netty.buffer.CompositeChannelBuffer
 import org.jboss.netty.channel.ChannelHandlerContext
 import org.slf4j.LoggerFactory
@@ -53,33 +53,30 @@ class CustomNettyGatewayEndpointRoute(val nettyServerName: String, val contextPa
 
       override def configure() {
 
-        onException(classOf[java.lang.Exception]).handled(true).process(new Processor() {
-          override def process(exchange: Exchange) {
-            exchange.getIn.setHeader("Access-Control-Allow-Origin", "*")
-            exchange.getIn.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, " +
-              FixedTokenAuthGatewayInterceptor.tokenHeader + ", " + FixedTokenAuthGatewayInterceptor.plainApiHeader)
-            val ex = exchange.getProperty(Exchange.EXCEPTION_CAUGHT, classOf[java.lang.Exception])
-            if (apiMode.equalsIgnoreCase("PRODUCTION")) {
-              if (ex.getClass.getSimpleName.equalsIgnoreCase("DisabledException") ||
-                ex.getClass.getSimpleName.equalsIgnoreCase("BadCredentialsException") ||
-                ex.getClass.getSimpleName.equalsIgnoreCase("GeneralSecurityException") ||
-                ex.getClass.getSimpleName.equalsIgnoreCase("LoginMismatchedException")) {
-                exchange.getIn.setBody(ex.getClass.getSimpleName + ": " + ex.getMessage)
-              } else {
-                if (exchange.getIn.getHeaders.containsKey(FixedTokenAuthGatewayInterceptor.extendedLoginHeader) &&
-                  exchange.getIn.getHeader(FixedTokenAuthGatewayInterceptor.extendedLoginHeader, classOf[String]).equals(extendedLogging)) {
+        onException(classOf[java.lang.Exception]).handled(true).
+          process(new SecurityPipelineProcessor()).
+          process(new Processor() {
+            override def process(exchange: Exchange) {
+              val ex = exchange.getProperty(Exchange.EXCEPTION_CAUGHT, classOf[java.lang.Exception])
+              if (apiMode.equalsIgnoreCase("PRODUCTION")) {
+                if (ex.getClass.getSimpleName.equalsIgnoreCase("DisabledException") ||
+                  ex.getClass.getSimpleName.equalsIgnoreCase("BadCredentialsException") ||
+                  ex.getClass.getSimpleName.equalsIgnoreCase("GeneralSecurityException") ||
+                  ex.getClass.getSimpleName.equalsIgnoreCase("LoginMismatchedException")) {
                   exchange.getIn.setBody(ex.getClass.getSimpleName + ": " + ex.getMessage)
                 } else {
-                  exchange.getIn.setBody("ApiException: API Error")
+                  if (exchange.getIn.getHeaders.containsKey(FixedTokenAuthGatewayInterceptor.extendedLoginHeader) &&
+                    exchange.getIn.getHeader(FixedTokenAuthGatewayInterceptor.extendedLoginHeader, classOf[String]).equals(extendedLogging)) {
+                    exchange.getIn.setBody(ex.getClass.getSimpleName + ": " + ex.getMessage)
+                  } else {
+                    exchange.getIn.setBody("ApiException: API Error")
+                  }
                 }
+              } else {
+                exchange.getIn.setBody(ex.getClass.getSimpleName + ": " + ex.getMessage)
               }
-            } else {
-              exchange.getIn.setBody(ex.getClass.getSimpleName + ": " + ex.getMessage)
             }
-          }
-        }).
-          wireTap("direct:error-log-" + contextPath).
-          marshal().json(JsonLibrary.Jackson)
+          }).wireTap("direct:error-log-" + contextPath).marshal().json(JsonLibrary.Jackson)
 
         from("netty-http:http://0.0.0.0/" + contextPath + "?matchOnUriPrefix=true&nettySharedHttpServer=#" + nettyServerName).
           process(new Processor() {
@@ -101,6 +98,7 @@ class CustomNettyGatewayEndpointRoute(val nettyServerName: String, val contextPa
               }
             }
           }).
+          process(new SecurityPipelineProcessor()).
           process(restPipelineProcessor).
           choice().
           when(header(Exchange.HTTP_METHOD).isEqualTo("OPTIONS")).setBody().constant("").endChoice().
