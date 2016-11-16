@@ -3,7 +3,7 @@ package micromix.services.restgateway.spring
 import java.net.InetSocketAddress
 import java.nio.charset.Charset
 
-import io.fabric8.process.spring.boot.actuator.camel.rest.Headers
+import io.fabric8.process.spring.boot.actuator.camel.rest.{Headers, RestCodeException}
 import micromix.conflet.restgateway.FixedTokenAuthGatewayInterceptor
 import org.apache.camel.builder.RouteBuilder
 import org.apache.camel.component.netty.NettyConstants
@@ -65,15 +65,25 @@ class CustomNettyGatewayEndpointRoute(val nettyServerName: String, val contextPa
                   ex.getClass.getSimpleName.equalsIgnoreCase("LoginMismatchedException")) {
                   exchange.getIn.setBody(ex.getClass.getSimpleName + ": " + ex.getMessage)
                 } else {
-                  if (exchange.getIn.getHeaders.containsKey(FixedTokenAuthGatewayInterceptor.extendedLoginHeader) &&
-                    exchange.getIn.getHeader(FixedTokenAuthGatewayInterceptor.extendedLoginHeader, classOf[String]).equals(extendedLogging)) {
-                    exchange.getIn.setBody(ex.getClass.getSimpleName + ": " + ex.getMessage)
+                  if (ex.getClass.getSimpleName.equalsIgnoreCase("RestCodeException")) {
+                    val exception: RestCodeException = ex.asInstanceOf[RestCodeException]
+                    exchange.getIn.setBody(exception.getMessage + " " + exception.getMessageInfo)
                   } else {
-                    exchange.getIn.setBody("ApiException: API Error")
+                    if (exchange.getIn.getHeaders.containsKey(FixedTokenAuthGatewayInterceptor.extendedLoginHeader) &&
+                      exchange.getIn.getHeader(FixedTokenAuthGatewayInterceptor.extendedLoginHeader, classOf[String]).equals(extendedLogging)) {
+                      exchange.getIn.setBody(ex.getClass.getSimpleName + ": " + ex.getMessage)
+                    } else {
+                      exchange.getIn.setBody("ApiException: API Error")
+                    }
                   }
                 }
               } else {
-                exchange.getIn.setBody(ex.getClass.getSimpleName + ": " + ex.getMessage)
+                if (ex.getClass.getSimpleName.equalsIgnoreCase("RestCodeException")) {
+                  val exception: RestCodeException = ex.asInstanceOf[RestCodeException]
+                  exchange.getIn.setBody(exception.getMessage + " " + exception.getMessageInfo)
+                } else {
+                  exchange.getIn.setBody(ex.getClass.getSimpleName + ": " + ex.getMessage)
+                }
               }
             }
           }).wireTap("direct:error-log-" + contextPath).marshal().json(JsonLibrary.Jackson)

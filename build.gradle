@@ -2,7 +2,7 @@ allprojects {
     // Maven compatibility
     apply plugin: 'maven'
     group = 'pl.coderion.micromix'
-    version = '0.18.3-SNAPSHOT'
+    version = '0.19.3-SNAPSHOT'
 
     repositories {
         mavenLocal()

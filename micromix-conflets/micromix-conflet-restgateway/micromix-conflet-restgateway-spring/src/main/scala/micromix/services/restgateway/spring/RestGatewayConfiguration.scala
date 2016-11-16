@@ -80,10 +80,20 @@ class NettyGatewayEndpointRoute(restPipelineProcessor: RestPipelineProcessor, ap
                   ex.getClass.getSimpleName.equalsIgnoreCase("LoginMismatchedException")) {
                   exchange.getIn.setBody(ex.getClass.getSimpleName + ": " + ex.getMessage)
                 } else {
-                  exchange.getIn.setBody("ApiException: API Error")
+                  if (ex.getClass.getSimpleName.equalsIgnoreCase("RestCodeException")) {
+                    val exception: RestCodeException = ex.asInstanceOf[RestCodeException]
+                    exchange.getIn.setBody(exception.getMessage + " " + exception.getMessageInfo)
+                  } else {
+                    exchange.getIn.setBody("ApiException: API Error")
+                  }
                 }
               } else {
-                exchange.getIn.setBody(ex.getClass.getSimpleName + ": " + ex.getMessage)
+                if (ex.getClass.getSimpleName.equalsIgnoreCase("RestCodeException")) {
+                  val exception: RestCodeException = ex.asInstanceOf[RestCodeException]
+                  exchange.getIn.setBody(exception.getMessage + " " + exception.getMessageInfo)
+                } else {
+                  exchange.getIn.setBody(ex.getClass.getSimpleName + ": " + ex.getMessage)
+                }
               }
               if (exchange.getProperties.containsKey(ID)) {
                 log.error("ERROR ID {} {} ", exchange.getProperty(ID), ex.getMessage)

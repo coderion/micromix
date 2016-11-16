@@ -1,7 +1,8 @@
 package micromix.services.restgateway.spring
 
-import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.{JsonMappingException, ObjectMapper}
 import com.fasterxml.jackson.databind.ObjectMapper.DefaultTyping
+import com.fasterxml.jackson.databind.exc.InvalidFormatException
 import io.fabric8.process.spring.boot.actuator.camel.rest._
 import org.apache.camel.component.netty.NettyConstants
 import org.apache.camel.component.netty.http.NettyHttpMessage
@@ -99,7 +100,51 @@ class RestPipelineProcessor(restInterceptor: RestInterceptor) extends RestPipeli
       exchange.getIn.setBody(x.parameters.zipWithIndex.map(p => exchange.getContext.getTypeConverter.convertTo(method.getParameterTypes()(p._2), p._1)))
     } else {
       val parameterType = method.getParameterTypes()(method.getParameterTypes().length-1)
-      exchange.getIn.setBody(x.parameters.zipWithIndex.map(p => exchange.getContext.getTypeConverter.convertTo(method.getParameterTypes()(p._2), p._1)) :+ resolveJsonMapper(exchange).readValue(body, parameterType))
+
+      try {
+        exchange.getIn.setBody(x.parameters.zipWithIndex.map(p => exchange.getContext.getTypeConverter.convertTo(method.getParameterTypes()(p._2), p._1)) :+ resolveJsonMapper(exchange).readValue(body, parameterType))
+      } catch {
+
+        case e: JsonMappingException =>
+          if (e.getMessage.contains("Invalid numeric value: Leading zeroes not allowed")) {
+            throw new RestCodeException("3001", "Invalid numeric value")
+          }
+          if (e.getMessage.contains("Unrecognized token") || e.getMessage.contains("Unexpected character")) {
+            val split = e.getMessage.split("'")
+            throw new RestCodeException("3001", "Value not found: " + split(1))
+          }
+          if (e.getMessage.contains("Can not construct instance of")) {
+            val split = e.getMessage.split("\\s+")
+            val model = split(5)
+            val enum = model.split('.').last
+            if (e.getMessage.contains("from String value")) {
+              val model = split(9)
+              throw new RestCodeException("3001", "Value not found: " + model + " " + enum)
+            } else {
+              throw new RestCodeException("3001", "Value not found: " + enum)
+            }
+          }
+          if (e.getMessage.contains("Can not deserialize instance of java.util.Date")) {
+            throw new RestCodeException("3001", "Value not found: Date")
+          }
+          throw new RestCodeException("3001")
+
+        case e: InvalidFormatException =>
+          if (e.getMessage.contains("Can not construct instance of")) {
+            val split = e.getMessage.split("\\s+")
+            val model = split(5)
+            val enum = model.split('.').last
+            if (e.getMessage.contains("from String value")) {
+              val model = split(9)
+              throw new RestCodeException("3002", "Value not found: " + model + " " + enum)
+            } else {
+              throw new RestCodeException("3002", "Value not found: " + enum)
+            }
+          }
+          throw new RestCodeException("3002")
+        case e: Exception =>
+          throw new RestCodeException("3003")
+      }
     }
     exchange.getIn.setHeader("bean", x.service)
     exchange.getIn.setHeader("method", x.operation)
