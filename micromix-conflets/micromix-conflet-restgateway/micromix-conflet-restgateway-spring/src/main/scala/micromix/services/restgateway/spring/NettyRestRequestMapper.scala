@@ -15,7 +15,7 @@ class NettyRestRequestMapper extends RestRequestMapper[NettyRequest] {
     val service = uriFragments(2)
     val operation = uriFragments(3)
     val params = uriFragments.slice(4, uriFragments.length)
-    new RestRequest(headers, service, operation, nettyRequest.channelContext.getChannel.getRemoteAddress, params: _*)
+    new RestRequest(headers, service, operation, nettyRequest.channelContext.channel().remoteAddress(), params: _*)
   }
 
 }

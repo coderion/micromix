@@ -3,13 +3,13 @@ package micromix.services.restgateway.spring
 import java.util.UUID
 
 import io.fabric8.process.spring.boot.actuator.camel.rest._
+import io.netty.buffer.CompositeByteBuf
+import io.netty.channel.ChannelHandlerContext
 import org.apache.camel.builder.RouteBuilder
-import org.apache.camel.component.netty.NettyConstants
-import org.apache.camel.component.netty.http.{DefaultNettySharedHttpServer, NettyHttpMessage, NettySharedHttpServerBootstrapConfiguration}
+import org.apache.camel.component.netty4.NettyConstants
+import org.apache.camel.component.netty4.http.{DefaultNettySharedHttpServer, NettyHttpMessage, NettySharedHttpServerBootstrapConfiguration}
 import org.apache.camel.model.dataformat.JsonLibrary
 import org.apache.camel.{Headers => _, _}
-import org.jboss.netty.buffer.CompositeChannelBuffer
-import org.jboss.netty.channel.ChannelHandlerContext
 import org.springframework.beans.factory.annotation.{Autowired, Value}
 import org.springframework.context.annotation.{Bean, Configuration}
 
@@ -93,7 +93,7 @@ class NettyGatewayEndpointRoute(restPipelineProcessor: RestPipelineProcessor, ap
             }
         }).marshal().json(JsonLibrary.Jackson)
 
-        from("netty-http:http://0.0.0.0/api?matchOnUriPrefix=true&nettySharedHttpServer=#sharedNettyHttpServer").
+        from("netty4-http:http://0.0.0.0/api?matchOnUriPrefix=true&nettySharedHttpServer=#sharedNettyHttpServer").
           process(new Processor() {
             override def process(exchange: Exchange) {
               exchange.setProperty(ID , UUID.randomUUID().toString)
@@ -123,12 +123,12 @@ class NettyGatewayEndpointRoute(restPipelineProcessor: RestPipelineProcessor, ap
             val request = exchange.getIn(classOf[NettyHttpMessage]).getHttpRequest
             val channelContext = exchange.getIn.getHeader(NettyConstants.NETTY_CHANNEL_HANDLER_CONTEXT, classOf[ChannelHandlerContext])
 
-            log.info("ID {} Client IP {} ", exchange.getProperty(ID), channelContext.getChannel.getRemoteAddress)
+            log.info("ID {} Client IP {} ", exchange.getProperty(ID), channelContext.channel().remoteAddress())
 
-            if (request.getContent != null && !request.getContent.isInstanceOf[CompositeChannelBuffer]) {
+            if (request.content() != null && !request.content().isInstanceOf[CompositeByteBuf]) {
               log.info("ID {} {} ", exchange.getProperty(ID), request.toString.replace("\n", " "))
-              if (request.getContent != null && !request.getContent.isInstanceOf[CompositeChannelBuffer]) {
-                log.info("ID {} {} ", exchange.getProperty(ID), new String(request.getContent.array()).replace("\n", " "))
+              if (request.content() != null && !request.content().isInstanceOf[CompositeByteBuf]) {
+                log.info("ID {} {} ", exchange.getProperty(ID), new String(request.content().array()).replace("\n", " "))
               }
             } else {
               log.info("ID {} {} ", exchange.getProperty(ID), request.getUri)

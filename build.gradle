@@ -2,7 +2,7 @@ allprojects {
     // Maven compatibility
     apply plugin: 'maven'
     group = 'pl.coderion.micromix'
-    version = '2.0.0-SNAPSHOT'
+    version = '2.1.0-SNAPSHOT'
 
     repositories {
         mavenLocal()
@@ -12,7 +12,7 @@ allprojects {
 
 subprojects {
     ext {
-        camelVersion = '2.15.1'
+        camelVersion = '2.15.2'
         camelSpring = "org.apache.camel:camel-spring:$camelVersion"
         junit = 'junit:junit:4.11'
         scalaLibrary = 'org.scala-lang:scala-library:2.10.3'
@@ -142,9 +142,9 @@ project('micromix-conflets') {
             dependencies {
                 compile scalaLibrary
                 compile springContext
-                compile 'org.apache.camel:camel-netty-http:2.15.1'
+                compile 'org.apache.camel:camel-netty4-http:2.15.2'
                 compile camelSpring
-                compile 'org.apache.camel:camel-jackson:2.15.1'
+                compile 'org.apache.camel:camel-jackson:2.15.2'
 
                 testCompile project(':micromix-boots:micromix-boot-spring')
                 testCompile project(':micromix-conflets:micromix-conflet-camel:micromix-conflet-camel-spring')
