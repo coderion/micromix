@@ -7,52 +7,13 @@ import io.netty.buffer.CompositeByteBuf
 import io.netty.channel.ChannelHandlerContext
 import org.apache.camel.builder.RouteBuilder
 import org.apache.camel.component.netty4.NettyConstants
-import org.apache.camel.component.netty4.http.{DefaultNettySharedHttpServer, NettyHttpMessage, NettySharedHttpServerBootstrapConfiguration}
+import org.apache.camel.component.netty4.http.NettyHttpMessage
 import org.apache.camel.model.dataformat.JsonLibrary
 import org.apache.camel.{Headers => _, _}
-import org.springframework.beans.factory.annotation.{Autowired, Value}
-import org.springframework.context.annotation.{Bean, Configuration}
 
 import scala.collection.JavaConversions._
 
-@Configuration
-class RestGatewayConfiguration {
 
-  @Value("${micromix.services.restgateway.spring.netty.port:18080}")
-  var port: Int = _
-
-  @Value("${micromix.api.mode:PRODUCTION}")
-  var apiMode: String = _
-
-  @Value("${micromix.api.logging:false}")
-  var apiLogging: Boolean = _
-
-  @Value("${micromix.services.restgateway.spring.netty.chunkedMaxContentLength:26214400}")
-  var chunkedMaxContentLength: Int = _
-
-  @Autowired(required = false)
-  var gatewayInterceptor: RestInterceptor = new NopRestInterceptor
-
-  @Bean
-  def nettyGatewayEndpointRoute =
-    new NettyGatewayEndpointRoute(pipelineProcessor, apiMode, apiLogging)
-
-  @Bean
-  def pipelineProcessor =
-    new RestPipelineProcessor(gatewayInterceptor)
-
-  @Bean(initMethod = "start", destroyMethod = "stop")
-  def sharedNettyHttpServer = {
-    val nettyConfig = new NettySharedHttpServerBootstrapConfiguration
-    nettyConfig.setHost("0.0.0.0")
-    nettyConfig.setPort(port)
-    nettyConfig.setChunkedMaxContentLength(chunkedMaxContentLength)
-    val netty = new DefaultNettySharedHttpServer()
-    netty.setNettyServerBootstrapConfiguration(nettyConfig)
-    netty
-  }
-
-}
 
 class NettyGatewayEndpointRoute(restPipelineProcessor: RestPipelineProcessor, apiMode: String, apiLogging: Boolean) extends RoutesBuilder {
 
