@@ -4,11 +4,11 @@ import com.fasterxml.jackson.databind.{JsonMappingException, ObjectMapper}
 import com.fasterxml.jackson.databind.ObjectMapper.DefaultTyping
 import com.fasterxml.jackson.databind.exc.InvalidFormatException
 import io.fabric8.process.spring.boot.actuator.camel.rest._
-import org.apache.camel.component.netty.NettyConstants
-import org.apache.camel.component.netty.http.NettyHttpMessage
+import io.netty.buffer.CompositeByteBuf
+import io.netty.channel.ChannelHandlerContext
+import org.apache.camel.component.netty4.NettyConstants
+import org.apache.camel.component.netty4.http.NettyHttpMessage
 import org.apache.camel.{Exchange, Processor}
-import org.jboss.netty.buffer.CompositeChannelBuffer
-import org.jboss.netty.channel.ChannelHandlerContext
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.ApplicationContext
 
@@ -74,10 +74,10 @@ class RestPipelineProcessor(restInterceptor: RestInterceptor) extends RestPipeli
     val request = exchange.getIn(classOf[NettyHttpMessage]).getHttpRequest
     val channelContext = exchange.getIn.getHeader(NettyConstants.NETTY_CHANNEL_HANDLER_CONTEXT, classOf[ChannelHandlerContext])
     var body: String = null
-    if (request.getContent.isInstanceOf[CompositeChannelBuffer]) {
+    if (request.content().isInstanceOf[CompositeByteBuf]) {
       body = exchange.getIn.getBody(classOf[String])
     } else {
-      body = new String(request.getContent.array())
+      body = new String(request.content().array())
     }
     val x = gatewayRequestMapper.mapRequest(NettyRequest(request, channelContext))
     val bean = applicationContext.getBean(x.service).getClass

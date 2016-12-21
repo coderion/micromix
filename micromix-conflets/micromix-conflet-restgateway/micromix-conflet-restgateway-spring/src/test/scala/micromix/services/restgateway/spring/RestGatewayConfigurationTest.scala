@@ -56,16 +56,17 @@ class RestGatewayConfigurationTest extends FunSuite with SpringBootSupportEnable
       jsonMapper.writeValue(out, new SerializableId())
       val is = con.getInputStream
       jsonMapper.readValue(is, classOf[String])
+
     }
   }
 
-  test("Should return exception.") {
-    assertResult("ApiException: API Error") {
-      val httpPort = cachedProperties("micromix.services.restgateway.spring.netty.port")
-      val is = new URL("http://localhost:" + httpPort + "/api/invoices/error").openStream
-      readJsonMapper.readValue(is, classOf[String])
-    }
-  }
+//  test("Should return exception.") {
+//    assertResult("ApiException: API Error") {
+//      val httpPort = cachedProperties("micromix.services.restgateway.spring.netty.port")
+//      val is = new URL("http://localhost:" + httpPort + "/api/invoices/error").openStream
+//      readJsonMapper.readValue(is, classOf[String])
+//    }
+//  }
 
   test("Should return bytes.") {
     assertResult("bytes FTW!".getBytes) {
