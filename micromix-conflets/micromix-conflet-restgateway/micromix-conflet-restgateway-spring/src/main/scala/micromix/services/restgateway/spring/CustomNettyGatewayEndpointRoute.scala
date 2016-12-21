@@ -3,7 +3,7 @@ package micromix.services.restgateway.spring
 import java.net.InetSocketAddress
 import java.nio.charset.Charset
 
-import io.fabric8.process.spring.boot.actuator.camel.rest.Headers
+import io.fabric8.process.spring.boot.actuator.camel.rest.{Headers, RestCodeException}
 import io.netty.buffer.CompositeByteBuf
 import io.netty.channel.ChannelHandlerContext
 import micromix.conflet.restgateway.FixedTokenAuthGatewayInterceptor
