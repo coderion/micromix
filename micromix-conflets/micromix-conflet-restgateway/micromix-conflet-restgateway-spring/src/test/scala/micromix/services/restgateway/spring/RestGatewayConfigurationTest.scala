@@ -4,7 +4,6 @@ import java.net.URL
 import java.util.{List => JList, Map => JMap}
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.ObjectMapper.DefaultTyping
 import micromix.boot.spring.SpringBootSupportEnabled
 import org.apache.commons.io.IOUtils
 import org.junit.runner.RunWith
@@ -23,7 +22,7 @@ class RestGatewayConfigurationTest extends FunSuite with SpringBootSupportEnable
   override def namedBeansDefinitions =
     Map("invoices" -> classOf[InvoicesService])
 
-  val jsonMapper = new ObjectMapper().enableDefaultTyping(DefaultTyping.NON_FINAL)
+  val jsonMapper = new ObjectMapper()
 
   val readJsonMapper = new ObjectMapper()
 
@@ -47,26 +46,26 @@ class RestGatewayConfigurationTest extends FunSuite with SpringBootSupportEnable
     }
   }
 
-  test("Should handle polymorphic arguments.") {
-    assertResult("response") {
-      val con = new URL("http://localhost:" + cachedProperties("micromix.services.restgateway.spring.netty.port") + "/api/invoices/methodTakingAbstract").openConnection()
-      con.setDoOutput(true)
-      con.setRequestProperty("Content-Type", "application/json")
-      val out = con.getOutputStream
-      jsonMapper.writeValue(out, new SerializableId())
-      val is = con.getInputStream
-      jsonMapper.readValue(is, classOf[String])
-
-    }
-  }
-
-//  test("Should return exception.") {
-//    assertResult("ApiException: API Error") {
-//      val httpPort = cachedProperties("micromix.services.restgateway.spring.netty.port")
-//      val is = new URL("http://localhost:" + httpPort + "/api/invoices/error").openStream
-//      readJsonMapper.readValue(is, classOf[String])
+//  test("Should handle polymorphic arguments.") {
+//    assertResult("response") {
+//      val con = new URL("http://localhost:" + cachedProperties("micromix.services.restgateway.spring.netty.port") + "/api/invoices/methodTakingAbstract").openConnection()
+//      con.setDoOutput(true)
+//      con.setRequestProperty("Content-Type", "application/json")
+//      val out = con.getOutputStream
+//      jsonMapper.writeValue(out, new SerializableId())
+//      val is = con.getInputStream
+//      jsonMapper.readValue(is, classOf[String])
+//
 //    }
 //  }
+
+  test("Should return exception.") {
+    assertResult("ApiException: API Error") {
+      val httpPort = cachedProperties("micromix.services.restgateway.spring.netty.port")
+      val is = new URL("http://localhost:" + httpPort + "/api/invoices/error").openStream
+      readJsonMapper.readValue(is, classOf[String])
+    }
+  }
 
   test("Should return bytes.") {
     assertResult("bytes FTW!".getBytes) {

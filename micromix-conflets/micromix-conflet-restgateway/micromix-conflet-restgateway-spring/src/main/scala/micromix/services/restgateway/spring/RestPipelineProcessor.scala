@@ -1,8 +1,8 @@
 package micromix.services.restgateway.spring
 
-import com.fasterxml.jackson.databind.{JsonMappingException, ObjectMapper}
 import com.fasterxml.jackson.databind.ObjectMapper.DefaultTyping
 import com.fasterxml.jackson.databind.exc.InvalidFormatException
+import com.fasterxml.jackson.databind.{JsonMappingException, ObjectMapper}
 import io.fabric8.process.spring.boot.actuator.camel.rest._
 import io.netty.buffer.CompositeByteBuf
 import io.netty.channel.ChannelHandlerContext
@@ -27,12 +27,7 @@ class RestPipelineProcessor(restInterceptor: RestInterceptor) extends RestPipeli
   private val plainInputJsonMapper = new ObjectMapper
 
   private def resolveJsonMapper(exchange: Exchange) = {
-    val api = exchange.getIn.getHeader("PLAIN_API", classOf[String])
-    if (java.lang.Boolean.parseBoolean(api)) {
-      plainInputJsonMapper
-    } else {
-      inputJsonMapper
-    }
+    plainInputJsonMapper
   }
 
   private def headerCleaner(exchange: Exchange) = {
