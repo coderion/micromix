@@ -3,7 +3,7 @@ package micromix.services.restgateway.spring
 import java.net.InetSocketAddress
 import java.nio.charset.Charset
 
-import io.fabric8.process.spring.boot.actuator.camel.rest.{Headers, RestCodeException}
+import io.fabric8.process.spring.boot.actuator.camel.rest.{Headers, RestCodeException, RestCodeResponse}
 import io.netty.buffer.CompositeByteBuf
 import io.netty.channel.ChannelHandlerContext
 import micromix.conflet.restgateway.FixedTokenAuthGatewayInterceptor
@@ -67,7 +67,8 @@ class CustomNettyGatewayEndpointRoute(val nettyServerName: String, val contextPa
                 } else {
                   if (ex.getClass.getSimpleName.equalsIgnoreCase("RestCodeException")) {
                     val exception: RestCodeException = ex.asInstanceOf[RestCodeException]
-                    exchange.getIn.setBody(exception.getMessage + " " + exception.getMessageInfo)
+                    val response = new RestCodeResponse(exception.getCode, exception.getMessageInfo)
+                    exchange.getIn.setBody(response)
                   } else {
                     if (exchange.getIn.getHeaders.containsKey(FixedTokenAuthGatewayInterceptor.extendedLoginHeader) &&
                       exchange.getIn.getHeader(FixedTokenAuthGatewayInterceptor.extendedLoginHeader, classOf[String]).equals(extendedLogging)) {
@@ -80,7 +81,8 @@ class CustomNettyGatewayEndpointRoute(val nettyServerName: String, val contextPa
               } else {
                 if (ex.getClass.getSimpleName.equalsIgnoreCase("RestCodeException")) {
                   val exception: RestCodeException = ex.asInstanceOf[RestCodeException]
-                  exchange.getIn.setBody(exception.getMessage + " " + exception.getMessageInfo)
+                  val response = new RestCodeResponse(exception.getCode, exception.getMessageInfo)
+                  exchange.getIn.setBody(response)
                 } else {
                   exchange.getIn.setBody(ex.getClass.getSimpleName + ": " + ex.getMessage)
                 }
