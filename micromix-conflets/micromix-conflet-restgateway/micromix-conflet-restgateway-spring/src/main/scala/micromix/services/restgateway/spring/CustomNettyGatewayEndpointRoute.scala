@@ -63,7 +63,7 @@ class CustomNettyGatewayEndpointRoute(val nettyServerName: String, val contextPa
                   ex.getClass.getSimpleName.equalsIgnoreCase("BadCredentialsException") ||
                   ex.getClass.getSimpleName.equalsIgnoreCase("GeneralSecurityException") ||
                   ex.getClass.getSimpleName.equalsIgnoreCase("LoginMismatchedException")) {
-                  exchange.getIn.setBody(ex.getClass.getSimpleName + ": " + ex.getMessage)
+                  exchange.getIn.setBody(ex.getMessage)
                 } else {
                   if (ex.getClass.getSimpleName.equalsIgnoreCase("RestCodeException")) {
                     val exception: RestCodeException = ex.asInstanceOf[RestCodeException]
@@ -72,7 +72,7 @@ class CustomNettyGatewayEndpointRoute(val nettyServerName: String, val contextPa
                   } else {
                     if (exchange.getIn.getHeaders.containsKey(FixedTokenAuthGatewayInterceptor.extendedLoginHeader) &&
                       exchange.getIn.getHeader(FixedTokenAuthGatewayInterceptor.extendedLoginHeader, classOf[String]).equals(extendedLogging)) {
-                      exchange.getIn.setBody(ex.getClass.getSimpleName + ": " + ex.getMessage)
+                      exchange.getIn.setBody(ex.getMessage)
                     } else {
                       exchange.getIn.setBody("ApiException: API Error")
                     }
@@ -84,7 +84,7 @@ class CustomNettyGatewayEndpointRoute(val nettyServerName: String, val contextPa
                   val response = new RestCodeResponse(exception.getCode, exception.getMessageInfo)
                   exchange.getIn.setBody(response)
                 } else {
-                  exchange.getIn.setBody(ex.getClass.getSimpleName + ": " + ex.getMessage)
+                  exchange.getIn.setBody(ex.getMessage)
                 }
               }
               exchange.getIn.setHeader(Exchange.HTTP_RESPONSE_CODE, 400)
