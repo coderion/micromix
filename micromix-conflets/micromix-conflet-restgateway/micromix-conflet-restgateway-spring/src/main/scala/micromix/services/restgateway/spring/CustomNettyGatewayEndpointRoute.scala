@@ -87,6 +87,7 @@ class CustomNettyGatewayEndpointRoute(val nettyServerName: String, val contextPa
                   exchange.getIn.setBody(ex.getClass.getSimpleName + ": " + ex.getMessage)
                 }
               }
+              exchange.getIn.setHeader(Exchange.HTTP_RESPONSE_CODE, 400)
             }
           }).wireTap("direct:error-log-" + contextPath).marshal().json(JsonLibrary.Jackson)
 
