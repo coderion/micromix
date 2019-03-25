@@ -63,7 +63,7 @@ subprojects {
             mavenDeployer {
                 beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
 
-                def snapshotRepo = 'http://nexus.coderion.pl/repository/coderion-snapshots/'
+                def snapshotRepo = 'http://nexus.coderion.pl/repository/maven-snapshots/'
                 def releaseRepo = 'https://oss.sonatype.org/service/local/staging/deploy/maven2/'
                 repository(url: isReleaseVersion ? releaseRepo : snapshotRepo) {
                     authentication(userName: sonatypeUsername, password: sonatypePassword)
